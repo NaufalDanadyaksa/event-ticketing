@@ -177,19 +177,19 @@
 
 ### 3.A Infrastructure Setup
 
-- [ ] **3.1** Buat `apps/backend/src/infrastructure/prisma.ts` — Prisma Client singleton dengan lazy instantiation
-- [ ] **3.2** Buat `apps/backend/src/utils/responseHelper.ts`:
+- [x] **3.1** Buat `apps/backend/src/infrastructure/prisma.ts` — Prisma Client singleton dengan lazy instantiation
+- [x] **3.2** Buat `apps/backend/src/utils/responseHelper.ts`:
   ```typescript
   export const successResponse = (data?: any, message?: string) => ({ success: true, message, data });
   export const errorResponse = (message: string, errors?: any) => ({ success: false, message, errors });
   ```
-- [ ] **3.3** Buat `apps/backend/src/utils/ticketCodeGenerator.ts`:
+- [x] **3.3** Buat `apps/backend/src/utils/ticketCodeGenerator.ts`:
   ```typescript
   // Format: EVT-YYYYMM-XXXXXX (6 karakter alphanumeric uppercase)
   export const generateTicketCode = (): string => { ... }
   ```
-- [ ] **3.4** Buat `apps/backend/src/utils/slugGenerator.ts`: Konversi judul event ke slug URL-friendly
-- [ ] **3.5** Buat `apps/backend/src/utils/attendanceSecretGenerator.ts`:
+- [x] **3.4** Buat `apps/backend/src/utils/slugGenerator.ts`: Konversi judul event ke slug URL-friendly
+- [x] **3.5** Buat `apps/backend/src/utils/attendanceSecretGenerator.ts`:
   ```typescript
   import { randomBytes } from 'crypto';
   export const generateAttendanceSecret = () => randomBytes(32).toString('hex');
@@ -197,15 +197,15 @@
 
 ### 3.B Domain Entities (Murni TypeScript, No Framework)
 
-- [ ] **3.6** Buat `apps/backend/src/domain/entities/User.ts` — Interface atau class entitas User
-- [ ] **3.7** Buat `apps/backend/src/domain/entities/Event.ts` — Interface atau class entitas Event
+- [x] **3.6** Buat `apps/backend/src/domain/entities/User.ts` — Interface atau class entitas User
+- [x] **3.7** Buat `apps/backend/src/domain/entities/Event.ts` — Interface atau class entitas Event
   - Method bisnis: `isRegistrationOpen()`, `hasAvailableSlots(currentCount: number)`, `isActive()`
-- [ ] **3.8** Buat `apps/backend/src/domain/entities/Registration.ts` — Interface atau class entitas Registration
+- [x] **3.8** Buat `apps/backend/src/domain/entities/Registration.ts` — Interface atau class entitas Registration
   - Method bisnis: `isConfirmed()`, `hasCheckedIn()`, `hasAttended()`
 
 ### 3.C Domain Errors
 
-- [ ] **3.9** Buat `apps/backend/src/domain/errors/DomainErrors.ts`:
+- [x] **3.9** Buat `apps/backend/src/domain/errors/DomainErrors.ts`:
   - `EventNotFoundError`
   - `RegistrationDeadlinePassedError`
   - `EventQuotaFullError`
@@ -220,7 +220,7 @@
 
 ### 3.D Interface Repositories (Abstraksi Domain)
 
-- [ ] **3.10** Buat `apps/backend/src/domain/repositories/IUserRepository.ts`:
+- [x] **3.10** Buat `apps/backend/src/domain/repositories/IUserRepository.ts`:
   ```typescript
   interface IUserRepository {
     findById(id: string): Promise<User | null>;
@@ -228,7 +228,7 @@
     create(data: CreateUserDTO): Promise<User>;
   }
   ```
-- [ ] **3.11** Buat `apps/backend/src/domain/repositories/IEventRepository.ts`:
+- [x] **3.11** Buat `apps/backend/src/domain/repositories/IEventRepository.ts`:
   ```typescript
   interface IEventRepository {
     findAll(params: EventListParams): Promise<{ events: Event[]; total: number }>;
@@ -239,7 +239,7 @@
     countRegistrations(eventId: string): Promise<number>;
   }
   ```
-- [ ] **3.12** Buat `apps/backend/src/domain/repositories/IRegistrationRepository.ts`:
+- [x] **3.12** Buat `apps/backend/src/domain/repositories/IRegistrationRepository.ts`:
   ```typescript
   interface IRegistrationRepository {
     findById(id: string): Promise<Registration | null>;
@@ -255,39 +255,39 @@
 
 ### 3.E Concrete Prisma Repositories (Interface Adapters)
 
-- [ ] **3.13** Buat `apps/backend/src/repositories/PrismaUserRepository.ts` — Implementasi `IUserRepository` menggunakan Prisma
-- [ ] **3.14** Buat `apps/backend/src/repositories/PrismaEventRepository.ts` — Implementasi `IEventRepository` menggunakan Prisma
+- [x] **3.13** Buat `apps/backend/src/repositories/PrismaUserRepository.ts` — Implementasi `IUserRepository` menggunakan Prisma
+- [x] **3.14** Buat `apps/backend/src/repositories/PrismaEventRepository.ts` — Implementasi `IEventRepository` menggunakan Prisma
   - `findAll()` harus support pagination (`skip`, `take`) dan filter (`search`, `isPublished`)
-- [ ] **3.15** Buat `apps/backend/src/repositories/PrismaRegistrationRepository.ts` — Implementasi `IRegistrationRepository`
+- [x] **3.15** Buat `apps/backend/src/repositories/PrismaRegistrationRepository.ts` — Implementasi `IRegistrationRepository`
   - `findAllByEvent()` harus support filter `status` dan pagination
 
 ### 3.F Services (Infrastructure)
 
-- [ ] **3.16** Buat `apps/backend/src/services/qr/AttendanceTokenEngine.ts` (sesuai spesifikasi algoritma Section 6 implementation_plan):
+- [x] **3.16** Buat `apps/backend/src/services/qr/AttendanceTokenEngine.ts` (sesuai spesifikasi algoritma Section 6 implementation_plan):
   - `generateToken(eventId, secret)` → `{ qrPayload, expiresInMs, timeStep }`
   - `verifyToken(qrPayload, secret)` → `boolean`
   - `getCurrentTimeStep()` → `number`
-- [ ] **3.17** Buat `apps/backend/src/services/qr/QRGenerator.ts`:
+- [x] **3.17** Buat `apps/backend/src/services/qr/QRGenerator.ts`:
   - `generateQRCodeDataURL(text: string)` → `Promise<string>` (Base64 PNG data URL)
   - Digunakan untuk generate QR code tiket di dalam email HTML
-- [ ] **3.18** Buat `apps/backend/src/services/email/templates/ticket.template.ts`:
+- [x] **3.18** Buat `apps/backend/src/services/email/templates/ticket.template.ts`:
   - Fungsi `generateTicketEmailHTML(data: TicketEmailData)` → HTML string yang responsif
   - Menerima: eventTitle, eventDate, eventLocation, attendeeName, ticketCode, qrCodeDataURL, magicToken, status
   - Merender kartu tiket visual dengan embedded QR code, detail event, dan tombol CTA magic link
-- [ ] **3.19** Buat `apps/backend/src/services/email/EmailService.ts`:
+- [x] **3.19** Buat `apps/backend/src/services/email/EmailService.ts`:
   - Konfigurasi Nodemailer transporter (SMTP dari env)
   - `sendTicketEmail(to: string, data: TicketEmailData)` → `Promise<void>`
   - Panggil `generateTicketEmailHTML()` + kirim via Nodemailer
 
 ### 3.G Use Cases — Auth
 
-- [ ] **3.20** Buat `apps/backend/src/use-cases/auth/RegisterUserUseCase.ts`:
+- [x] **3.20** Buat `apps/backend/src/use-cases/auth/RegisterUserUseCase.ts`:
   - Input: `{ name, email, password, phone? }`
   - Business rules: cek duplikat email via `IUserRepository.findByEmail()`
   - Hash password dengan bcrypt (salt rounds: 12)
   - Create user via `IUserRepository.create()`
   - Output: User object (tanpa passwordHash)
-- [ ] **3.21** Buat `apps/backend/src/use-cases/auth/LoginUserUseCase.ts`:
+- [x] **3.21** Buat `apps/backend/src/use-cases/auth/LoginUserUseCase.ts`:
   - Input: `{ email, password }`
   - Business rules: cek user exist, compare password bcrypt, generate JWT
   - JWT payload: `{ userId, email, role, iat, exp }`
@@ -295,21 +295,21 @@
 
 ### 3.H Use Cases — Events
 
-- [ ] **3.22** Buat `apps/backend/src/use-cases/events/CreateEventUseCase.ts`:
+- [x] **3.22** Buat `apps/backend/src/use-cases/events/CreateEventUseCase.ts`:
   - Input: `CreateEventDTO` + `createdById: string`
   - Business rules: generate unique slug, generate `attendanceSecret` (crypto.randomBytes)
   - Validasi: jika `isPaid=true`, field bank wajib ada
   - Output: Event object
-- [ ] **3.23** Buat `apps/backend/src/use-cases/events/UpdateEventUseCase.ts`:
+- [x] **3.23** Buat `apps/backend/src/use-cases/events/UpdateEventUseCase.ts`:
   - Input: `eventId: string`, `updateData: Partial<CreateEventDTO>`
   - Business rules: cek event exist, update slug jika title berubah
   - Output: Event object
-- [ ] **3.24** Buat `apps/backend/src/use-cases/events/ListEventsUseCase.ts`:
+- [x] **3.24** Buat `apps/backend/src/use-cases/events/ListEventsUseCase.ts`:
   - Input: pagination + search params
   - Hanya return event dengan `isPublished=true`
   - Sertakan `registeredCount` per event
   - Output: paginated list
-- [ ] **3.25** Buat `apps/backend/src/use-cases/events/GetEventDetailUseCase.ts`:
+- [x] **3.25** Buat `apps/backend/src/use-cases/events/GetEventDetailUseCase.ts`:
   - Input: `slug: string`
   - Return event detail + `registeredCount` + availability info
   - Hitung kuota tersisa: `maxParticipants - registeredCount`
@@ -317,7 +317,7 @@
 
 ### 3.I Use Cases — Registrations
 
-- [ ] **3.26** Buat `apps/backend/src/use-cases/registrations/RegisterAttendeeUseCase.ts`:
+- [x] **3.26** Buat `apps/backend/src/use-cases/registrations/RegisterAttendeeUseCase.ts`:
   - Input: `eventId`, `name`, `email`, `phone`, `userId?` (null jika guest), `paymentProofPath?`
   - Business rules (dalam urutan):
     1. Cek event exist
@@ -333,13 +333,13 @@
     8. Jika `status === CONFIRMED`: panggil `EmailService.sendTicketEmail()`
   - Output: `{ registration, emailSent: boolean }`
 
-- [ ] **3.27** Buat `apps/backend/src/use-cases/registrations/UploadPaymentProofUseCase.ts`:
+- [x] **3.27** Buat `apps/backend/src/use-cases/registrations/UploadPaymentProofUseCase.ts`:
   - Input: `registrationId`, `filePath: string`
   - Business rules: cek registration exist, status harus `WAITING_PAYMENT` atau `REJECTED`
   - Update: `status = PAYMENT_SUBMITTED`, `paymentProofUrl = filePath`, clear `rejectionReason`
   - Output: Updated Registration
 
-- [ ] **3.28** Buat `apps/backend/src/use-cases/registrations/ReviewPaymentUseCase.ts`:
+- [x] **3.28** Buat `apps/backend/src/use-cases/registrations/ReviewPaymentUseCase.ts`:
   - Input: `registrationId`, `action: "APPROVE" | "REJECT"`, `rejectionReason?: string`, `adminId: string`
   - Business rules: cek registration exist, status harus `PAYMENT_SUBMITTED`
   - Jika `APPROVE`:
@@ -351,7 +351,7 @@
 
 ### 3.J Use Cases — Staff Gate Check-In
 
-- [ ] **3.29** Buat `apps/backend/src/use-cases/staff/VerifyGateCheckInUseCase.ts`:
+- [x] **3.29** Buat `apps/backend/src/use-cases/staff/VerifyGateCheckInUseCase.ts`:
   - Input: `ticketCode: string`, `staffId: string`
   - Business rules:
     1. Cari registrasi by `ticketCode` — throw `RegistrationNotFoundError` jika tidak ada
@@ -362,13 +362,13 @@
 
 ### 3.K Use Cases — Dynamic Attendance
 
-- [ ] **3.30** Buat `apps/backend/src/use-cases/attendance/GetLiveAttendanceTokenUseCase.ts`:
+- [x] **3.30** Buat `apps/backend/src/use-cases/attendance/GetLiveAttendanceTokenUseCase.ts`:
   - Input: `eventId: string`
   - Business rules: cek event exist dan `attendanceEnabled=true`
   - Panggil `AttendanceTokenEngine.generateToken(eventId, event.attendanceSecret)`
   - Output: `{ qrPayload, expiresInMs, timeStep }`
 
-- [ ] **3.31** Buat `apps/backend/src/use-cases/attendance/VerifyDynamicAttendanceUseCase.ts`:
+- [x] **3.31** Buat `apps/backend/src/use-cases/attendance/VerifyDynamicAttendanceUseCase.ts`:
   - Input: `qrPayload: string`, identifier: `{ magicToken?: string; ticketCode?: string; userId?: string }`
   - Business rules:
     1. Decode `qrPayload` untuk mendapatkan `eventId`
@@ -381,7 +381,7 @@
     8. Update: `attendanceStatus = ATTENDED`, `attendedAt = now()`
   - Output: `{ attendeeName, attendedAt }`
 
-**Verifikasi Phase 3**: `npm run type-check -w apps/backend` tanpa error. Semua use case terimplementasi dan memiliki penanganan error yang sesuai.
+**Verifikasi Phase 3**: `npm run type-check -w apps/backend` tanpa error. Semua use case terimplementasi dan memiliki penanganan error yang sesuai. [SELESAI]
 
 ---
 

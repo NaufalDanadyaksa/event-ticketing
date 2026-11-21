@@ -13,13 +13,13 @@
 
 > Tujuan: Menyiapkan struktur monorepo Turborepo + npm workspaces, konfigurasi TypeScript base, dan environment file.
 
-- [ ] **0.1** Inisialisasi `package.json` root dengan konfigurasi `workspaces: ["apps/*", "packages/*"]`
-- [ ] **0.2** Buat `turbo.json` dengan pipeline:
+- [x] **0.1** Inisialisasi `package.json` root dengan konfigurasi `workspaces: ["apps/*", "packages/*"]`
+- [x] **0.2** Buat `turbo.json` dengan pipeline:
   - `build` → dependsOn: `^build`
   - `dev` → persistent: true
   - `lint` → dependsOn: `^lint`
   - `type-check` → dependsOn: `^build`
-- [ ] **0.3** Buat `tsconfig.base.json` sebagai base konfigurasi TypeScript yang diextend semua packages:
+- [x] **0.3** Buat `tsconfig.base.json` sebagai base konfigurasi TypeScript yang diextend semua packages:
   ```json
   {
     "compilerOptions": {
@@ -31,8 +31,8 @@
     }
   }
   ```
-- [ ] **0.4** Buat `.gitignore` root (node_modules, dist, .env, uploads/)
-- [ ] **0.5** Buat `.env.example` di root dan `apps/backend/`
+- [x] **0.4** Buat `.gitignore` root (node_modules, dist, .env, uploads/)
+- [x] **0.5** Buat `.env.example` di root dan `apps/backend/`
   ```env
   DATABASE_URL="mysql://root:password@localhost:3306/event_ticketing"
   JWT_SECRET="your-super-secret-jwt-key-min-32-chars"
@@ -46,10 +46,10 @@
   BACKEND_URL="http://localhost:3000"
   PORT=3000
   ```
-- [ ] **0.6** Pastikan direktori dasar monorepo terbentuk: `apps/backend/`, `apps/frontend/`, `packages/shared/`
-- [ ] **0.7** Jalankan `npm install` di root untuk inisialisasi workspace
+- [x] **0.6** Pastikan direktori dasar monorepo terbentuk: `apps/backend/`, `apps/frontend/`, `packages/shared/`
+- [x] **0.7** Jalankan `npm install` di root untuk inisialisasi workspace
 
-**Verifikasi**: `ls apps/ packages/` menampilkan struktur yang benar.
+**Verifikasi**: `ls apps/ packages/` menampilkan struktur yang benar. [SELESAI]
 
 ---
 
@@ -59,7 +59,7 @@
 
 ### 1.A Setup Package
 
-- [ ] **1.1** Buat `packages/shared/package.json`:
+- [x] **1.1** Buat `packages/shared/package.json`:
   ```json
   {
     "name": "shared",
@@ -72,12 +72,12 @@
     }
   }
   ```
-- [ ] **1.2** Buat `packages/shared/tsconfig.json` yang extend `../../tsconfig.base.json`
-- [ ] **1.3** Install dependency shared: `zod@^3.x`
+- [x] **1.2** Buat `packages/shared/tsconfig.json` yang extend `../../tsconfig.base.json`
+- [x] **1.3** Install dependency shared: `zod@^3.x`
 
 ### 1.B Enum & Konstanta
 
-- [ ] **1.4** Buat `packages/shared/src/enums/index.ts` yang mendefinisikan:
+- [x] **1.4** Buat `packages/shared/src/enums/index.ts` yang mendefinisikan:
   - `Role`: `ADMIN | STAFF | USER`
   - `RegistrationStatus`: `WAITING_PAYMENT | PAYMENT_SUBMITTED | CONFIRMED | REJECTED | CANCELLED`
   - `CheckInStatus`: `NOT_CHECKED_IN | CHECKED_IN`
@@ -85,29 +85,29 @@
 
 ### 1.C TypeScript Interfaces & DTOs
 
-- [ ] **1.5** Buat `packages/shared/src/types/user.types.ts`:
+- [x] **1.5** Buat `packages/shared/src/types/user.types.ts`:
   - `IUser`: `{ id, email, name, phone?, role, createdAt, updatedAt }`
   - `IAuthResponse`: `{ accessToken: string; user: IUser }`
   - `IUserProfile`: Public-safe user object
-- [ ] **1.6** Buat `packages/shared/src/types/event.types.ts`:
+- [x] **1.6** Buat `packages/shared/src/types/event.types.ts`:
   - `IEvent`: Semua kolom event termasuk `isPaid`, `price`, `bankName`, dll.
   - `IEventListItem`: Versi ringkas untuk daftar (title, slug, date, price, registeredCount)
   - `IEventAvailability`: `{ available: boolean; quota: number; registered: number; deadlinePassed: boolean }`
-- [ ] **1.7** Buat `packages/shared/src/types/registration.types.ts`:
+- [x] **1.7** Buat `packages/shared/src/types/registration.types.ts`:
   - `IRegistration`: Full object pendaftaran
   - `ITicketDetail`: Objek untuk halaman tiket digital (merge event + registration data)
   - `IRegistrationListItem`: Untuk dashboard admin (payment review)
-- [ ] **1.8** Buat `packages/shared/src/types/attendance.types.ts`:
+- [x] **1.8** Buat `packages/shared/src/types/attendance.types.ts`:
   - `IAttendanceTokenPayload`: `{ eventId: string; step: number; sig: string }`
   - `ILiveAttendanceToken`: Response dari API proyektor
   - `IAttendanceVerifyResult`: Result dari proses verify absensi
 
 ### 1.D Zod Validation Schemas
 
-- [ ] **1.9** Buat `packages/shared/src/validations/auth.schema.ts`:
+- [x] **1.9** Buat `packages/shared/src/validations/auth.schema.ts`:
   - `RegisterUserSchema`: name, email (email format), password (min 8, 1 huruf besar, 1 angka), phone (optional)
   - `LoginSchema`: email, password
-- [ ] **1.10** Buat `packages/shared/src/validations/event.schema.ts`:
+- [x] **1.10** Buat `packages/shared/src/validations/event.schema.ts`:
   - `CreateEventSchema`: Validasi semua field event termasuk:
     - `price` min 0 jika isPaid=true
     - `bankName/bankAccountNumber/bankAccountHolder` required jika isPaid=true
@@ -115,7 +115,7 @@
     - `registrationDeadline` harus sebelum `eventStartDate`
     - `maxParticipants` min 0 (0 = unlimited)
   - `UpdateEventSchema`: Partial dari CreateEventSchema
-- [ ] **1.11** Buat `packages/shared/src/validations/registration.schema.ts`:
+- [x] **1.11** Buat `packages/shared/src/validations/registration.schema.ts`:
   - `GuestRegisterSchema`: name (required), email (email format), phone (required)
   - `ReviewPaymentSchema`: `action: "APPROVE" | "REJECT"`, `rejectionReason` (required jika REJECT, min 10 char)
   - `StaffCheckInSchema`: `ticketCode` (string, non-empty)
@@ -123,11 +123,11 @@
 
 ### 1.E Re-export Index
 
-- [ ] **1.12** Buat `packages/shared/src/index.ts` yang re-export semua dari enums, types, validations
-- [ ] **1.13** Build shared package: `npm run build -w packages/shared`
-- [ ] **1.14** Verifikasi: `dist/` terbentuk dengan `index.js` dan `index.d.ts`
+- [x] **1.12** Buat `packages/shared/src/index.ts` yang re-export semua dari enums, types, validations
+- [x] **1.13** Build shared package: `npm run build -w packages/shared`
+- [x] **1.14** Verifikasi: `dist/` terbentuk dengan `index.js` dan `index.d.ts`
 
-**Verifikasi Phase 1**: `cd packages/shared && npm run type-check` tanpa error.
+**Verifikasi Phase 1**: `cd packages/shared && npm run type-check` tanpa error. [SELESAI]
 
 ---
 
@@ -137,16 +137,16 @@
 
 ### 2.A Setup Backend & Prisma
 
-- [ ] **2.1** Buat `apps/backend/package.json` dengan semua dependencies backend
-- [ ] **2.2** Buat `apps/backend/tsconfig.json` yang extend base config
-- [ ] **2.3** Install semua backend dependencies (express, @prisma/client, jsonwebtoken, bcrypt, nodemailer, multer, qrcode, uuid, cors, express-rate-limit, dotenv)
-- [ ] **2.4** Install backend devDependencies (prisma, tsx, semua @types/*)
-- [ ] **2.5** Buat `apps/backend/.env` dari template `.env.example`
-- [ ] **2.6** Inisialisasi Prisma: `npx prisma init --datasource-provider mysql`
+- [x] **2.1** Buat `apps/backend/package.json` dengan semua dependencies backend
+- [x] **2.2** Buat `apps/backend/tsconfig.json` yang extend base config
+- [x] **2.3** Install semua backend dependencies (express, @prisma/client, jsonwebtoken, bcrypt, nodemailer, multer, qrcode, uuid, cors, express-rate-limit, dotenv)
+- [x] **2.4** Install backend devDependencies (prisma, tsx, semua @types/*)
+- [x] **2.5** Buat `apps/backend/.env` dari template `.env.example`
+- [x] **2.6** Inisialisasi Prisma: `npx prisma init --datasource-provider mysql`
 
 ### 2.B Skema Prisma
 
-- [ ] **2.7** Tulis `apps/backend/prisma/schema.prisma` lengkap mencakup:
+- [x] **2.7** Tulis `apps/backend/prisma/schema.prisma` lengkap mencakup:
   - **Enums**: `Role`, `RegistrationStatus`, `CheckInStatus`, `AttendanceStatus`
   - **Model User**: id (uuid), email (unique), passwordHash, name, phone?, role, createdAt, updatedAt
     - Relasi: `registrations`, `eventsCreated` (AdminEvents), `checkInsPerformed` (StaffCheckIns)
@@ -155,19 +155,19 @@
   - **Model Registration**: Semua field termasuk `ticketCode` (unique), `magicToken` (unique, default uuid)
     - Index pada `eventId`, `email`, `ticketCode`, `magicToken`
     - Relasi `checkedInByStaff` → User via `StaffCheckIns`
-- [ ] **2.8** Jalankan migrasi pertama:
+- [x] **2.8** Jalankan migrasi pertama:
   ```bash
   cd apps/backend && npx prisma migrate dev --name init_event_ticketing_schema
   ```
-- [ ] **2.9** Generate Prisma Client: `npx prisma generate`
-- [ ] **2.10** Verifikasi koneksi database dengan Prisma Studio: `npx prisma studio`
-- [ ] **2.11** Buat seed script `apps/backend/prisma/seed.ts`:
+- [x] **2.9** Generate Prisma Client: `npx prisma generate`
+- [x] **2.10** Verifikasi koneksi database dengan Prisma Studio: `npx prisma studio`
+- [x] **2.11** Buat seed script `apps/backend/prisma/seed.ts`:
   - Buat 1 akun Admin default: `admin@event.com` / password: `Admin123!`
   - Buat 1 akun Staff: `staff@event.com` / password: `Staff123!`
   - Buat 1 event contoh (gratis) + 1 event contoh (berbayar)
-- [ ] **2.12** Jalankan seed: `npx prisma db seed`
+- [x] **2.12** Jalankan seed: `npx prisma db seed`
 
-**Verifikasi Phase 2**: Buka Prisma Studio, pastikan tabel `User`, `Event`, `Registration` terbentuk dengan benar dan data seed tersedia.
+**Verifikasi Phase 2**: Buka Prisma Studio, pastikan tabel `User`, `Event`, `Registration` terbentuk dengan benar dan data seed tersedia. [SELESAI]
 
 ---
 

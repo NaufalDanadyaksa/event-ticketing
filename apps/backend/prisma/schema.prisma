@@ -86,7 +86,7 @@ model Event {
 
 model Registration {
   id                 String             @id @default(uuid())
-  ticketCode         String             @unique
+  ticketCode         String?            @unique
   magicToken         String             @unique @default(uuid())
 
   eventId            String

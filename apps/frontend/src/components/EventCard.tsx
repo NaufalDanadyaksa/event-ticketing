@@ -8,6 +8,7 @@ import {
   Ticket,
 } from 'lucide-react';
 import { IEventListItem, IEvent } from 'shared';
+import { getImageUrl } from '@/utils/imageUrl';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 
@@ -71,7 +72,7 @@ export const EventCard: React.FC<EventCardProps> = ({
       <div className="relative w-full h-44 bg-gradient-to-br from-blue-100 to-sky-200 overflow-hidden flex items-center justify-center">
         {event.bannerUrl ? (
           <img
-            src={event.bannerUrl}
+            src={getImageUrl(event.bannerUrl)}
             alt={event.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

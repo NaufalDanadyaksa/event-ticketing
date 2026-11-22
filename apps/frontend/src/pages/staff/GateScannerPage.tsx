@@ -95,7 +95,7 @@ export const GateScannerPage: React.FC = () => {
 
         const newHistoryItem: ScanHistoryItem = {
           id: reg.id,
-          ticketCode: reg.ticketCode,
+          ticketCode: reg.ticketCode || trimmedCode,
           name: reg.name,
           time: new Date().toLocaleTimeString('id-ID', {
             hour: '2-digit',
@@ -229,7 +229,7 @@ export const GateScannerPage: React.FC = () => {
                     <p className="text-xs font-semibold text-emerald-300">
                       Kode Tiket:{' '}
                       <span className="font-mono text-white font-bold">
-                        {feedback.registration.ticketCode}
+                        {feedback.registration.ticketCode || '-'}
                       </span>
                     </p>
                     {feedback.event && (

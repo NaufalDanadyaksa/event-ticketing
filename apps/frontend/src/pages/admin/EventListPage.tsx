@@ -21,6 +21,7 @@ import { adminApi } from '@/services/api';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { getImageUrl } from '@/utils/imageUrl';
 import type { IEvent } from 'shared';
 
 export const EventListPage: React.FC = () => {
@@ -265,7 +266,7 @@ export const EventListPage: React.FC = () => {
                           <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-100 to-sky-100 border border-blue-200/80 overflow-hidden flex items-center justify-center shrink-0">
                             {event.bannerUrl ? (
                               <img
-                                src={event.bannerUrl}
+                                src={getImageUrl(event.bannerUrl)}
                                 alt={event.title}
                                 className="w-full h-full object-cover"
                               />

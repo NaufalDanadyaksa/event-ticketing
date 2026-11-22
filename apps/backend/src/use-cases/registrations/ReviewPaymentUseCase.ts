@@ -2,6 +2,7 @@ import { Registration } from '../../domain/entities';
 import { RegistrationNotFoundError } from '../../domain/errors';
 import { IEventRepository, IRegistrationRepository } from '../../domain/repositories';
 import { EmailService } from '../../services';
+import { generateTicketCode } from '../../utils';
 
 export interface ReviewPaymentDTO {
   registrationId: string;
@@ -25,32 +26,35 @@ export class ReviewPaymentUseCase {
     }
 
     if (dto.action === 'APPROVE') {
-      registration.approvePayment(dto.adminId);
+      const ticketCode = registration.ticketCode || generateTicketCode();
+      registration.approvePayment(dto.adminId, ticketCode);
       const updated = await this.registrationRepository.update(registration);
 
-      // Dispatch ticket email on payment approval
+      // Dispatch ticket email on payment approval in background
       if (this.emailService) {
-        try {
-          const event = await this.eventRepository.findById(registration.eventId);
-          if (event) {
-            await this.emailService.sendTicketEmail(updated.email, {
-              recipientName: updated.name,
-              recipientEmail: updated.email,
-              recipientPhone: updated.phone,
-              ticketCode: updated.ticketCode,
-              magicToken: updated.magicToken,
-              eventTitle: event.title,
-              eventSlug: event.slug,
-              eventStartDate: event.eventStartDate,
-              eventEndDate: event.eventEndDate,
-              eventLocation: event.location,
-              qrCodeDataUrl: '',
-              appUrl: dto.appUrl,
-            });
-          }
-        } catch (error) {
-          console.error('[ReviewPaymentUseCase] Failed to send ticket confirmation email:', error);
-        }
+        this.eventRepository
+          .findById(registration.eventId)
+          .then((event) => {
+            if (event && this.emailService) {
+              return this.emailService.sendTicketEmail(updated.email, {
+                recipientName: updated.name,
+                recipientEmail: updated.email,
+                recipientPhone: updated.phone,
+                ticketCode: updated.ticketCode || '',
+                magicToken: updated.magicToken,
+                eventTitle: event.title,
+                eventSlug: event.slug,
+                eventStartDate: event.eventStartDate,
+                eventEndDate: event.eventEndDate,
+                eventLocation: event.location,
+                qrCodeDataUrl: '',
+                appUrl: dto.appUrl,
+              });
+            }
+          })
+          .catch((error) => {
+            console.error('[ReviewPaymentUseCase] Failed to send ticket confirmation email:', error);
+          });
       }
 
       return updated;

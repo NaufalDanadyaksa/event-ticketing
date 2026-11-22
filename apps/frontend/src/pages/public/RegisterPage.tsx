@@ -17,6 +17,7 @@ import {
   Check,
   ShieldCheck,
   LogIn,
+  Clock,
 } from 'lucide-react';
 import { IEvent, IRegistration } from 'shared';
 import { eventsApi } from '@/services/api/events.api';
@@ -169,7 +170,7 @@ export const RegisterPage: React.FC = () => {
       formData.append('phone', phone.trim());
 
       if (receiptFile) {
-        formData.append('receipt', receiptFile);
+        formData.append('paymentProof', receiptFile);
       }
 
       const response = await registrationsApi.registerForEvent(event.id, formData);
@@ -239,14 +240,27 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <div className="p-4 bg-blue-50/70 rounded-2xl border border-blue-200/60 text-left space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-semibold uppercase tracking-wider">
-                Kode Tiket
-              </span>
-              <span className="font-mono font-bold text-sm text-blue-700 bg-white px-3 py-1 rounded-lg border border-blue-200">
-                {registeredTicket.ticketCode}
-              </span>
-            </div>
+            {registeredTicket.status === 'CONFIRMED' && registeredTicket.ticketCode ? (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-semibold uppercase tracking-wider">
+                  Kode Tiket
+                </span>
+                <span className="font-mono font-bold text-sm text-blue-700 bg-white px-3 py-1 rounded-lg border border-blue-200">
+                  {registeredTicket.ticketCode}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-semibold uppercase tracking-wider">
+                  Status
+                </span>
+                <span className="font-semibold text-xs text-amber-700 bg-amber-50 px-3 py-1 rounded-lg border border-amber-200">
+                  {registeredTicket.status === 'PAYMENT_SUBMITTED'
+                    ? 'Menunggu Review Pembayaran Admin'
+                    : 'Menunggu Pembayaran'}
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-500 font-semibold uppercase tracking-wider">
@@ -271,10 +285,22 @@ export const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Link akses e-tiket juga telah dikirimkan ke email <strong>{email}</strong>. Anda dapat
-            langsung membuka e-tiket sekarang.
-          </p>
+          {registeredTicket.status === 'CONFIRMED' && registeredTicket.ticketCode ? (
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Link akses e-tiket juga telah dikirimkan ke email <strong>{email}</strong>. Anda dapat
+              langsung membuka e-tiket sekarang.
+            </p>
+          ) : (
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 text-left space-y-1">
+              <p className="font-semibold flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Tiket Resmi Akan Diterbitkan Setelah Pembayaran Dikonfirmasi</span>
+              </p>
+              <p className="text-slate-600 text-[11px] leading-relaxed">
+                Bukti transfer Anda sedang dalam antrean review oleh Admin. Setelah disetujui, kode tiket resmi dan QR check-in akan diterbitkan otomatis serta dikirimkan ke email <strong>{email}</strong>.
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Button

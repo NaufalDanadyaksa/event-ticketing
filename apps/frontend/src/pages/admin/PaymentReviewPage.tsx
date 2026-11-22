@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
+import { getImageUrl } from '@/utils/imageUrl';
 import { RegistrationStatus, type IRegistrationListItem } from 'shared';
 
 export const PaymentReviewPage: React.FC = () => {
@@ -72,7 +73,7 @@ export const PaymentReviewPage: React.FC = () => {
         );
         setFeedback({
           type: 'success',
-          message: `Pembayaran tiket ${reg.ticketCode} atas nama ${reg.name} berhasil disetujui!`,
+          message: `Pembayaran ${reg.ticketCode ? `tiket ${reg.ticketCode}` : 'pendaftaran'} atas nama ${reg.name} berhasil disetujui!`,
         });
         if (previewItem?.id === reg.id) {
           setPreviewItem(null);
@@ -114,7 +115,7 @@ export const PaymentReviewPage: React.FC = () => {
         );
         setFeedback({
           type: 'success',
-          message: `Pembayaran tiket ${rejectingItem.ticketCode} telah ditolak.`,
+          message: `Pembayaran ${rejectingItem.ticketCode ? `tiket ${rejectingItem.ticketCode}` : `pendaftaran ${rejectingItem.name}`} telah ditolak.`,
         });
         setRejectingItem(null);
         setRejectionReason('');
@@ -136,8 +137,8 @@ export const PaymentReviewPage: React.FC = () => {
       const matchesSearch =
         reg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         reg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        reg.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (reg.eventTitle && reg.eventTitle.toLowerCase().includes(searchQuery.toLowerCase()));
+        Boolean(reg.ticketCode && reg.ticketCode.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        Boolean(reg.eventTitle && reg.eventTitle.toLowerCase().includes(searchQuery.toLowerCase()));
 
       if (!matchesSearch) return false;
 
@@ -149,13 +150,6 @@ export const PaymentReviewPage: React.FC = () => {
   const countByStatus = (status: string) => {
     if (status === 'ALL') return registrations.length;
     return registrations.filter((r) => r.status === status).length;
-  };
-
-  const getFullImageUrl = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const base = import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:3000';
-    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
   };
 
   return (
@@ -293,9 +287,15 @@ export const PaymentReviewPage: React.FC = () => {
                       <td className="py-4 px-6">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">
-                              {reg.ticketCode}
-                            </span>
+                            {reg.ticketCode ? (
+                              <span className="font-mono text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">
+                                {reg.ticketCode}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                Belum Terbit
+                              </span>
+                            )}
                             <span className="font-bold text-slate-900">{reg.name}</span>
                           </div>
                           <div className="flex items-center gap-3 text-xs text-slate-500">
@@ -329,7 +329,7 @@ export const PaymentReviewPage: React.FC = () => {
                           >
                             <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                               <img
-                                src={getFullImageUrl(reg.paymentProofUrl)}
+                                src={getImageUrl(reg.paymentProofUrl)}
                                 alt="Bukti Transfer"
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                               />
@@ -401,14 +401,14 @@ export const PaymentReviewPage: React.FC = () => {
         <Modal
           isOpen={Boolean(previewItem)}
           onClose={() => setPreviewItem(null)}
-          title={`Bukti Pembayaran: ${previewItem.ticketCode}`}
+          title={`Bukti Pembayaran: ${previewItem.ticketCode || previewItem.name}`}
           description={`Atas nama ${previewItem.name} untuk event ${previewItem.eventTitle}`}
           maxWidth="lg"
         >
           <div className="space-y-4">
             <div className="w-full max-h-[500px] rounded-2xl bg-slate-900 overflow-hidden flex items-center justify-center p-2">
               <img
-                src={getFullImageUrl(previewItem.paymentProofUrl)}
+                src={getImageUrl(previewItem.paymentProofUrl)}
                 alt="Bukti Transfer Penuh"
                 className="max-h-[480px] w-auto object-contain rounded-xl"
               />
@@ -452,7 +452,7 @@ export const PaymentReviewPage: React.FC = () => {
             setRejectError(null);
           }}
           title="Tolak Pembayaran Tiket"
-          description={`Tiket ${rejectingItem.ticketCode} atas nama ${rejectingItem.name}`}
+          description={`${rejectingItem.ticketCode ? `Tiket ${rejectingItem.ticketCode}` : 'Pendaftaran'} atas nama ${rejectingItem.name}`}
           maxWidth="md"
         >
           <div className="space-y-4">

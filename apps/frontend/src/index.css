@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================================================================
+   PRINT STYLES (Bug 3: Print Ticket Layout)
+   ================================================================ */
+@media print {
+  @page {
+    margin: 1cm;
+    size: auto;
+  }
+
+  body, html, #root {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #0f172a !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Reset shadows and glow for clean print rendering */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .ticket-card {
+    box-shadow: none !important;
+    border: 1.5px solid #cbd5e1 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 auto !important;
+  }
+}

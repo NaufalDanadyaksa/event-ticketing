@@ -2,7 +2,7 @@ import { RegistrationStatus, CheckInStatus, AttendanceStatus } from 'shared';
 
 export interface RegistrationProps {
   id: string;
-  ticketCode: string;
+  ticketCode?: string | null;
   magicToken: string;
   eventId: string;
   userId?: string | null;
@@ -25,7 +25,7 @@ export interface RegistrationProps {
 
 export class Registration {
   public readonly id: string;
-  public readonly ticketCode: string;
+  public ticketCode: string | null;
   public readonly magicToken: string;
   public readonly eventId: string;
   public userId: string | null;
@@ -47,7 +47,7 @@ export class Registration {
 
   constructor(props: RegistrationProps) {
     this.id = props.id;
-    this.ticketCode = props.ticketCode;
+    this.ticketCode = props.ticketCode ?? null;
     this.magicToken = props.magicToken;
     this.eventId = props.eventId;
     this.userId = props.userId ?? null;
@@ -87,8 +87,11 @@ export class Registration {
     this.updatedAt = new Date();
   }
 
-  public approvePayment(adminId: string): void {
+  public approvePayment(adminId: string, generatedTicketCode?: string): void {
     this.status = RegistrationStatus.CONFIRMED;
+    if (generatedTicketCode) {
+      this.ticketCode = generatedTicketCode;
+    }
     this.approvedAt = new Date();
     this.approvedByAdminId = adminId;
     this.rejectionReason = null;

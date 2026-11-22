@@ -9,6 +9,8 @@ import {
   QrCode,
   ShieldCheck,
   CheckCircle,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import {
   RegistrationStatus,
@@ -19,7 +21,7 @@ import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 
 export interface TicketCardProps {
-  ticketCode: string;
+  ticketCode?: string | null;
   eventTitle: string;
   eventStartDate?: Date | string;
   eventEndDate?: Date | string;
@@ -120,14 +122,36 @@ export const TicketCard: React.FC<TicketCardProps> = ({
       {/* Ticket Body Details */}
       <div className="p-6 bg-white flex flex-col gap-5">
         {/* Ticket Code Display */}
-        <div className="flex flex-col items-center justify-center p-4 bg-blue-50/70 border border-blue-200/60 rounded-2xl text-center">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mb-1">
-            Kode Tiket Anda
-          </span>
-          <div className="font-mono text-xl font-extrabold tracking-widest text-slate-900 select-all">
-            {ticketCode}
+        {status === RegistrationStatus.REJECTED ? (
+          <div className="flex flex-col items-center justify-center p-4 bg-rose-50/70 border border-rose-200/70 rounded-2xl text-center gap-1.5">
+            <div className="flex items-center gap-1.5 text-rose-800 font-bold text-xs">
+              <AlertCircle className="w-4 h-4 text-rose-600" />
+              <span>Pendaftaran Ditolak</span>
+            </div>
+            <p className="text-[11px] text-rose-700">
+              Bukti pembayaran tidak valid atau telah ditolak. Tiket tidak dapat diterbitkan.
+            </p>
           </div>
-        </div>
+        ) : isConfirmed && ticketCode ? (
+          <div className="flex flex-col items-center justify-center p-4 bg-blue-50/70 border border-blue-200/60 rounded-2xl text-center">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mb-1">
+              Kode Tiket Anda
+            </span>
+            <div className="font-mono text-xl font-extrabold tracking-widest text-slate-900 select-all">
+              {ticketCode}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-4 bg-amber-50/70 border border-amber-200/70 rounded-2xl text-center gap-1.5">
+            <div className="flex items-center gap-1.5 text-amber-800 font-bold text-xs">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>Menunggu Konfirmasi Pembayaran</span>
+            </div>
+            <p className="text-[11px] text-amber-700">
+              Kode tiket dan QR check-in resmi akan diterbitkan setelah pembayaran diverifikasi oleh admin.
+            </p>
+          </div>
+        )}
 
         {/* Attendee Info Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -193,7 +217,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({
 
         {/* Live Attendance Action Button */}
         {attendanceEnabled && isConfirmed && onScanAttendance && !isAttended && (
-          <div className="pt-2">
+          <div className="pt-2 print:hidden">
             <Button
               variant="primary"
               size="md"

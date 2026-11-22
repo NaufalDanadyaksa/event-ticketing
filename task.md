@@ -791,6 +791,123 @@
 
 ---
 
+## Phase 5.2: Bug Fixing (Banner, Print Layout, Registration Latency & Upload Field)
+
+> Tujuan: Memperbaiki 5 bug teknis yang dilaporkan pengguna (loading banner/logo event, layout cetak tiket, latensi pendaftaran lambat, dan error unexpected field saat upload bukti transfer).
+
+### 5.2.A Banner Event & Image Loading (Bug 1 & 2)
+
+- [x] **5.2.1** Buat utilitas terpusat `apps/frontend/src/utils/imageUrl.ts`:
+  - Normalisasi path relatif `/uploads/...` ke backend URL (`http://localhost:3000`)
+  - Penanganan URL absolut (`http://`, `https://`, `data:`) dan string kosong/null
+- [x] **5.2.2** Perbarui `apps/frontend/vite.config.ts`:
+  - Tambahkan konfigurasi proxy `/uploads` mengarah ke backend `http://localhost:3000`
+- [x] **5.2.3** Perbarui `apps/frontend/src/components/EventCard.tsx`:
+  - Gunakan `getImageUrl(event.bannerUrl)` pada tag gambar banner
+- [x] **5.2.4** Perbarui `apps/frontend/src/pages/public/EventDetailPage.tsx`:
+  - Gunakan `getImageUrl(event.bannerUrl)` pada hero image banner
+- [x] **5.2.5** Perbarui `apps/frontend/src/pages/admin/EventListPage.tsx`:
+  - Gunakan `getImageUrl(event.bannerUrl)` pada thumbnail tabel event
+- [x] **5.2.6** Perbarui `apps/frontend/src/pages/admin/EventFormPage.tsx`:
+  - Gunakan `getImageUrl` pada preview banner mode edit
+- [x] **5.2.7** Refactor `apps/frontend/src/pages/admin/PaymentReviewPage.tsx`:
+  - Gunakan utilitas `getImageUrl` terpusat menggantikan fungsi lokal
+
+### 5.2.B Cetak Tiket Digital (Bug 3)
+
+- [x] **5.2.8** Perbarui `apps/frontend/src/layouts/PublicLayout.tsx`:
+  - Tambahkan class `print:hidden` pada `<header>` dan `<footer>` agar tidak mengotori cetakan tiket
+- [x] **5.2.9** Perbarui `apps/frontend/src/pages/attendee/DigitalTicketPage.tsx`:
+  - Tampilkan Gate Check-in QR Code secara eksplisit pada layout cetak tiket
+  - Sembunyikan tombol navigasi, refresh, tombol cetak, kamera scanner, dan status instruksi venue saat dicetak (`print:hidden`)
+- [x] **5.2.10** Tambahkan styling cetak ramah printer di `apps/frontend/src/index.css`:
+  - Aturan `@media print` dengan background putih bersih, hilangkan efek bayangan (shadow), dan `page-break-inside: avoid`
+
+### 5.2.C Latensi Pendaftaran & Asynchronous Email (Bug 4)
+
+- [x] **5.2.11** Perbarui `apps/backend/src/use-cases/registrations/RegisterAttendeeUseCase.ts`:
+  - Ubah pemanggilan `sendTicketEmail` menjadi proses background asynchronous (non-blocking) agar respon HTTP kembali seketika (< 50ms)
+- [x] **5.2.12** Perbarui `apps/backend/src/use-cases/registrations/ReviewPaymentUseCase.ts`:
+  - Ubah pemanggilan `sendTicketEmail` saat approval menjadi asynchronous non-blocking
+- [x] **5.2.13** Perbarui `apps/backend/src/services/email/EmailService.ts`:
+  - Tambahkan timeout konfigurasi pada transport Nodemailer (`connectionTimeout`, `greetingTimeout`, `socketTimeout`) agar tidak menggantung tanpa batas
+
+### 5.2.D Unexpected Field pada Upload Bukti Transfer (Bug 5)
+
+- [x] **5.2.14** Perbarui `apps/frontend/src/pages/public/RegisterPage.tsx`:
+  - Ubah FormData append key dari `'receipt'` menjadi `'paymentProof'` agar sesuai dengan kontrak backend
+- [x] **5.2.15** Perbarui `apps/backend/src/middlewares/uploadMiddleware.ts`:
+  - Buat `uploadReceipt` toleran terhadap kedua field name (`paymentProof` dan `receipt`) menggunakan `multer.fields` dan normalisasi `req.file`
+
+### 5.2.E Verifikasi & Kualitas
+
+- [x] **5.2.16** Jalankan `npm run type-check -w apps/backend` (wajib 0 error)
+- [x] **5.2.17** Jalankan `npm run type-check -w apps/frontend` (wajib 0 error)
+- [x] **5.2.18** Jalankan `npm run build -w apps/frontend` untuk memverifikasi build produksi
+[SELESAI & TERVERIFIKASI]
+
+---
+
+## Phase 5.3: Conditional Ticket Generation (Pending Payment Approval)
+
+> Tujuan: Memastikan tiket dan kode tiket (`ticketCode`) HANYA diterbitkan ketika status pembayaran telah terkonfirmasi (`CONFIRMED`). Pada event berbayar yang masih `WAITING_PAYMENT` atau `PAYMENT_SUBMITTED`, tiket belum digenerate dan QR Code tidak boleh aktif.
+
+### 5.3.A Shared Models & Types (packages/shared)
+
+- [x] **5.3.1** Perbarui `packages/shared/src/types/registration.types.ts`:
+  - Ubah `ticketCode` menjadi `string | null` pada interface `IRegistration`, `ITicketDetail`, dan `IRegistrationListItem`
+- [x] **5.3.2** Re-build `packages/shared`:
+  - Jalankan `npm run build -w packages/shared` dan verifikasi `dist/` ter-update
+
+### 5.3.B Database Schema & Migration (Prisma MySQL)
+
+- [x] **5.3.3** Perbarui `apps/backend/prisma/schema.prisma`:
+  - Ubah definisi kolom `ticketCode String? @unique` pada model `Registration` agar nullable di database
+- [x] **5.3.4** Jalankan migrasi Prisma dan regenerasi client:
+  - Jalankan `npx prisma migrate dev --name make_ticket_code_nullable` dan `npx prisma generate` di `apps/backend`
+
+### 5.3.C Backend Domain & Application Layer (Entities, Use Cases, Repositories)
+
+- [x] **5.3.5** Perbarui `apps/backend/src/domain/entities/Registration.ts`:
+  - Ubah properti `ticketCode?: string | null`
+  - Perbarui method `approvePayment(adminId: string, generatedTicketCode?: string)` untuk menyetel `ticketCode` saat disetujui
+- [x] **5.3.6** Perbarui `apps/backend/src/use-cases/registrations/RegisterAttendeeUseCase.ts`:
+  - Jika event gratis (`!event.isPaid`), generate `ticketCode` langsung (`status = CONFIRMED`)
+  - Jika event berbayar (`event.isPaid`), jangan generate `ticketCode` (`ticketCode = null`, `status = WAITING_PAYMENT`)
+- [x] **5.3.7** Perbarui `apps/backend/src/use-cases/registrations/ReviewPaymentUseCase.ts`:
+  - Saat admin menyetujui pembayaran (`action === 'APPROVE'`), baru generate tiket resmi `generateTicketCode()` dan set ke registrasi
+  - Kirim email tiket e-tiket resmi bersama QR Code yang baru diterbitkan
+- [x] **5.3.8** Perbarui `apps/backend/src/repositories/PrismaRegistrationRepository.ts`:
+  - Pastikan mapping `ticketCode: model.ticketCode ?? null` berjalan aman saat create, update, dan find
+
+### 5.3.D Backend Delivery Mechanism (Controllers)
+
+- [x] **5.3.9** Perbarui `apps/backend/src/controllers/RegistrationController.ts` & `AdminRegistrationController.ts`:
+  - Pastikan payload JSON response mendukung `ticketCode: string | null`
+
+### 5.3.E Frontend Presentation & State (Components & Pages)
+
+- [x] **5.3.10** Perbarui `apps/frontend/src/components/TicketCard.tsx`:
+  - Dukung prop `ticketCode?: string | null`. Jika null, tampilkan placeholder `MENUNGGU KONFIRMASI ADMIN`
+- [x] **5.3.11** Perbarui `apps/frontend/src/pages/public/RegisterPage.tsx`:
+  - Pada layar pendaftaran sukses, sembunyikan kode tiket jika status pendaftaran bukan `CONFIRMED`
+  - Tampilkan banner status: "Tiket dan QR Code akan diterbitkan otomatis setelah bukti transfer diverifikasi oleh admin"
+- [x] **5.3.12** Perbarui `apps/frontend/src/pages/attendee/DigitalTicketPage.tsx`:
+  - Sembunyikan QR Code check-in gerbang jika status belum `CONFIRMED` / `ticketCode` masih `null`
+  - Nonaktifkan tombol cetak tiket dan ganti dengan pemberitahuan status verifikasi
+- [x] **5.3.13** Perbarui `apps/frontend/src/pages/attendee/MyTicketsPage.tsx`:
+  - Tampilkan badge "Menunggu Pembayaran / Verifikasi" alih-alih nomor tiket belum terbit
+
+### 5.3.F Verifikasi & Kualitas
+
+- [x] **5.3.14** Jalankan `npm run type-check -w packages/shared` (0 error)
+- [x] **5.3.15** Jalankan `npm run type-check -w apps/backend` (0 error)
+- [x] **5.3.16** Jalankan `npm run type-check -w apps/frontend` (0 error)
+- [x] **5.3.17** Jalankan `npm run build -w apps/frontend` (build produksi sukses)
+[SELESAI & TERVERIFIKASI]
+
+---
+
 ## Phase 6: Integration, Testing & Verification
 
 > Tujuan: Verifikasi end-to-end semua alur kerja kritis, penanganan edge cases, dan kesiapan deployment.

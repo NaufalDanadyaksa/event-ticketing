@@ -273,7 +273,7 @@ export const VenuePresenterPage: React.FC = () => {
                       <span className="font-semibold text-white">{att.name}</span>
                     </div>
                     <span className="font-mono text-slate-400 text-[11px]">
-                      {att.ticketCode}
+                      {att.ticketCode || '-'}
                     </span>
                   </div>
                 ))}

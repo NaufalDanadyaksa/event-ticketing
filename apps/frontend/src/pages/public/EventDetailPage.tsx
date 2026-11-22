@@ -21,6 +21,7 @@ import { eventsApi, EventDetailResponse } from '@/services/api/events.api';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Spinner } from '@/components/ui/Spinner';
+import { getImageUrl } from '@/utils/imageUrl';
 
 export const EventDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -159,7 +160,7 @@ export const EventDetailPage: React.FC = () => {
       <div className="relative w-full h-64 sm:h-96 rounded-3xl overflow-hidden shadow-xl border border-blue-200/60 mb-8 bg-gradient-to-br from-blue-600 via-sky-500 to-blue-700">
         {event.bannerUrl ? (
           <img
-            src={event.bannerUrl}
+            src={getImageUrl(event.bannerUrl)}
             alt={event.title}
             className="w-full h-full object-cover"
           />

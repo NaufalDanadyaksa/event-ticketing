@@ -175,14 +175,16 @@ export const DigitalTicketPage: React.FC = () => {
             Segarkan
           </Button>
 
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handlePrint}
-            leftIcon={<Printer className="w-3.5 h-3.5" />}
-          >
-            Cetak Tiket
-          </Button>
+          {isConfirmed && registration.ticketCode && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handlePrint}
+              leftIcon={<Printer className="w-3.5 h-3.5" />}
+            >
+              Cetak Tiket
+            </Button>
+          )}
         </div>
       </div>
 
@@ -205,12 +207,12 @@ export const DigitalTicketPage: React.FC = () => {
         onScanAttendance={handleOpenScanner}
       />
 
-      {/* Action Sections Grid (Hidden on Print) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:hidden">
-        {/* Gate Check-in Section */}
-        <div className="bg-white/80 backdrop-blur-md border border-blue-200/60 rounded-3xl p-6 shadow-card flex flex-col items-center justify-between text-center gap-6">
+      {/* Action Sections Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:block">
+        {/* Gate Check-in Section (Visible on Screen & Print) */}
+        <div className="bg-white/80 print:bg-white backdrop-blur-md border border-blue-200/60 print:border-slate-300 rounded-3xl p-6 shadow-card print:shadow-none flex flex-col items-center justify-between text-center gap-6 print:break-inside-avoid print:mt-6">
           <div className="space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 print:text-slate-700">
               Pintu Masuk Venue
             </span>
             <h3 className="text-base font-bold text-slate-900">QR Check-in Gerbang</h3>
@@ -219,31 +221,45 @@ export const DigitalTicketPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-2">
-            <QRCodeDisplay
-              value={registration.ticketCode}
-              size={180}
-              subLabel={`Kode Tiket: ${registration.ticketCode}`}
-            />
-          </div>
+          {isConfirmed && registration.ticketCode ? (
+            <>
+              <div className="p-2 print:p-0">
+                <QRCodeDisplay
+                  value={registration.ticketCode}
+                  size={180}
+                  subLabel={`Kode Tiket: ${registration.ticketCode}`}
+                />
+              </div>
 
-          <div className="w-full pt-4 border-t border-blue-100/60 flex items-center justify-center gap-2">
-            {isCheckedIn ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle className="w-4 h-4" />
-                <span>Sudah Check-In di Gerbang</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                <Clock className="w-4 h-4" />
-                <span>Menunggu Check-In Gerbang</span>
-              </span>
-            )}
-          </div>
+              <div className="w-full pt-4 border-t border-blue-100/60 print:border-slate-200 flex items-center justify-center gap-2">
+                {isCheckedIn ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Sudah Check-In di Gerbang</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <Clock className="w-4 h-4" />
+                    <span>Menunggu Check-In Gerbang</span>
+                  </span>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="p-5 bg-amber-50/80 rounded-2xl border border-amber-200 text-center space-y-2 max-w-xs my-4">
+              <AlertTriangle className="w-8 h-8 text-amber-600 mx-auto" />
+              <p className="text-xs font-bold text-amber-900">
+                QR Code Belum Aktif
+              </p>
+              <p className="text-[11px] text-amber-700 leading-relaxed">
+                QR Code Gate Check-in akan aktif setelah bukti transfer disetujui admin.
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Dynamic Attendance Verification Section */}
-        <div className="bg-white/80 backdrop-blur-md border border-blue-200/60 rounded-3xl p-6 shadow-card flex flex-col justify-between gap-6">
+        {/* Dynamic Attendance Verification Section (Hidden on Print) */}
+        <div className="bg-white/80 backdrop-blur-md border border-blue-200/60 rounded-3xl p-6 shadow-card flex flex-col justify-between gap-6 print:hidden">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-sky-100 text-sky-600">
@@ -322,68 +338,70 @@ export const DigitalTicketPage: React.FC = () => {
       </div>
 
       {/* Interactive Modal: Camera QR Scanner for Attendance */}
-      <Modal
-        isOpen={isScannerOpen}
-        onClose={handleCloseScanner}
-        title="Pindai QR Absensi Proyektor"
-        description="Arahkan kamera HP ke QR Code yang berputar setiap 10 detik di layar presenter venue."
-        maxWidth="lg"
-      >
-        <div className="space-y-4">
-          {/* Active Scanner Viewport */}
-          {!scanResult?.success && (
-            <div className="py-2">
-              <QRScanner onScan={handleScanAttendance} />
-            </div>
-          )}
-
-          {/* Verifying Spinner Indicator */}
-          {isVerifying && (
-            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 flex items-center justify-center gap-3">
-              <Spinner size="sm" variant="primary" />
-              <span className="text-xs font-semibold text-blue-700">
-                Memverifikasi keabsahan token QR...
-              </span>
-            </div>
-          )}
-
-          {/* Scan Result Feedback Banner */}
-          {scanResult && (
-            <div
-              className={`p-4 rounded-2xl border text-xs flex items-start gap-3 animate-fade-in ${
-                scanResult.success
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                  : 'bg-red-50 border-red-200 text-red-800'
-              }`}
-            >
-              {scanResult.success ? (
-                <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-              ) : (
-                <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-              )}
-              <div className="space-y-1">
-                <p className="font-bold">
-                  {scanResult.success ? 'Absensi Terverifikasi!' : 'Verifikasi Gagal'}
-                </p>
-                <p className="leading-relaxed">{scanResult.message}</p>
+      <div className="print:hidden">
+        <Modal
+          isOpen={isScannerOpen}
+          onClose={handleCloseScanner}
+          title="Pindai QR Absensi Proyektor"
+          description="Arahkan kamera HP ke QR Code yang berputar setiap 10 detik di layar presenter venue."
+          maxWidth="lg"
+        >
+          <div className="space-y-4">
+            {/* Active Scanner Viewport */}
+            {!scanResult?.success && (
+              <div className="py-2">
+                <QRScanner onScan={handleScanAttendance} />
               </div>
-            </div>
-          )}
-
-          {/* Modal Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-blue-100">
-            {scanResult?.success ? (
-              <Button variant="primary" size="sm" onClick={handleCloseScanner}>
-                Selesai
-              </Button>
-            ) : (
-              <Button variant="secondary" size="sm" onClick={handleCloseScanner}>
-                Tutup Kamera
-              </Button>
             )}
+
+            {/* Verifying Spinner Indicator */}
+            {isVerifying && (
+              <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 flex items-center justify-center gap-3">
+                <Spinner size="sm" variant="primary" />
+                <span className="text-xs font-semibold text-blue-700">
+                  Memverifikasi keabsahan token QR...
+                </span>
+              </div>
+            )}
+
+            {/* Scan Result Feedback Banner */}
+            {scanResult && (
+              <div
+                className={`p-4 rounded-2xl border text-xs flex items-start gap-3 animate-fade-in ${
+                  scanResult.success
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-red-50 border-red-200 text-red-800'
+                }`}
+              >
+                {scanResult.success ? (
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                )}
+                <div className="space-y-1">
+                  <p className="font-bold">
+                    {scanResult.success ? 'Absensi Terverifikasi!' : 'Verifikasi Gagal'}
+                  </p>
+                  <p className="leading-relaxed">{scanResult.message}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Modal Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-blue-100">
+              {scanResult?.success ? (
+                <Button variant="primary" size="sm" onClick={handleCloseScanner}>
+                  Selesai
+                </Button>
+              ) : (
+                <Button variant="secondary" size="sm" onClick={handleCloseScanner}>
+                  Tutup Kamera
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 };

@@ -215,9 +215,16 @@ export const MyTicketsPage: React.FC = () => {
                 {/* Top Section: Status Badges & Ticket Code */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-xl">
-                      {ticket.ticketCode}
-                    </span>
+                    {ticket.status === RegistrationStatus.CONFIRMED && ticket.ticketCode ? (
+                      <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-xl">
+                        {ticket.ticketCode}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>Menunggu Konfirmasi</span>
+                      </span>
+                    )}
                     {getStatusBadge(ticket.status)}
                   </div>
 

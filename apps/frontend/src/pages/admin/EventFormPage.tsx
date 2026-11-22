@@ -20,6 +20,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
+import { getImageUrl } from '@/utils/imageUrl';
 
 export const EventFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,7 +91,7 @@ export const EventFormPage: React.FC = () => {
             setIsPublished(Boolean(ev.isPublished));
             if (ev.bannerUrl) {
               setExistingBannerUrl(ev.bannerUrl);
-              setBannerPreview(ev.bannerUrl);
+              setBannerPreview(getImageUrl(ev.bannerUrl));
             }
           }
         } catch (err: unknown) {
@@ -311,9 +312,9 @@ export const EventFormPage: React.FC = () => {
           <CardContent>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="w-full sm:w-64 h-36 rounded-2xl bg-blue-100/60 border-2 border-dashed border-blue-300 flex items-center justify-center overflow-hidden shrink-0">
-                {bannerPreview ? (
+                {bannerPreview || (isEditMode && existingBannerUrl) ? (
                   <img
-                    src={bannerPreview}
+                    src={bannerFile && bannerPreview ? bannerPreview : getImageUrl(existingBannerUrl) || bannerPreview || ''}
                     alt="Pratinjau Banner"
                     className="w-full h-full object-cover"
                   />

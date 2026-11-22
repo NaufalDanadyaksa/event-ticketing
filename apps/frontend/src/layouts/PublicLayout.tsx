@@ -31,7 +31,7 @@ export const PublicLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-sky-50/50 to-blue-100/40 text-slate-800">
       {/* Sticky Glass Navbar */}
-      <header className="sticky top-0 z-40 bg-white/75 backdrop-blur-md border-b border-blue-200/50 transition-all shadow-sm">
+      <header className="sticky top-0 z-40 bg-white/75 backdrop-blur-md border-b border-blue-200/50 transition-all shadow-sm print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Brand */}
@@ -320,7 +320,7 @@ export const PublicLayout: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-blue-200/50 bg-white/50 backdrop-blur-md">
+      <footer className="mt-auto border-t border-blue-200/50 bg-white/50 backdrop-blur-md print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div className="flex items-center gap-2.5">

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { RequestHandler } from 'express';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -42,11 +43,27 @@ const limits = {
   fileSize: 5 * 1024 * 1024, // 5MB
 };
 
-export const uploadReceipt = multer({
+const uploadReceiptFields = multer({
   storage: createStorage(RECEIPTS_DIR),
   fileFilter,
   limits,
-}).single('paymentProof');
+}).fields([
+  { name: 'paymentProof', maxCount: 1 },
+  { name: 'receipt', maxCount: 1 },
+]);
+
+export const uploadReceipt: RequestHandler = (req, res, next) => {
+  uploadReceiptFields(req, res, (err: any) => {
+    if (err) {
+      return next(err);
+    }
+    if (req.files) {
+      const files = req.files as Record<string, Express.Multer.File[]>;
+      req.file = files?.paymentProof?.[0] || files?.receipt?.[0];
+    }
+    next();
+  });
+};
 
 export const uploadBanner = multer({
   storage: createStorage(BANNERS_DIR),

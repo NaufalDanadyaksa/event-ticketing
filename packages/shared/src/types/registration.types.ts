@@ -2,7 +2,7 @@ import { RegistrationStatus, CheckInStatus, AttendanceStatus } from '../enums';
 
 export interface IRegistration {
   id: string;
-  ticketCode: string;
+  ticketCode?: string | null;
   magicToken: string;
   eventId: string;
   userId?: string | null;
@@ -25,7 +25,7 @@ export interface IRegistration {
 
 export interface ITicketDetail {
   id: string;
-  ticketCode: string;
+  ticketCode?: string | null;
   magicToken: string;
   status: RegistrationStatus;
   checkInStatus: CheckInStatus;
@@ -47,7 +47,7 @@ export interface ITicketDetail {
 
 export interface IRegistrationListItem {
   id: string;
-  ticketCode: string;
+  ticketCode?: string | null;
   name: string;
   email: string;
   phone: string;

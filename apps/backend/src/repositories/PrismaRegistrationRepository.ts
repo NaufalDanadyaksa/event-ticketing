@@ -38,6 +38,7 @@ export class PrismaRegistrationRepository implements IRegistrationRepository {
   }
 
   async findByTicketCode(ticketCode: string): Promise<Registration | null> {
+    if (!ticketCode) return null;
     const reg = await this.client.registration.findUnique({ where: { ticketCode } });
     return reg ? this.toDomain(reg) : null;
   }
@@ -172,6 +173,7 @@ export class PrismaRegistrationRepository implements IRegistrationRepository {
     const updated = await this.client.registration.update({
       where: { id: registration.id },
       data: {
+        ticketCode: registration.ticketCode,
         status: registration.status,
         paymentProofUrl: registration.paymentProofUrl,
         rejectionReason: registration.rejectionReason,

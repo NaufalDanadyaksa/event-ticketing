@@ -69,8 +69,8 @@ export class RegisterAttendeeUseCase {
       : RegistrationStatus.CONFIRMED;
     const approvedAt = status === RegistrationStatus.CONFIRMED ? new Date() : null;
 
-    // 6. Generate ticket code and unique magic token
-    const ticketCode = generateTicketCode();
+    // 6. Generate ticket code (only for free events / CONFIRMED) and unique magic token
+    const ticketCode = !event.isPaid ? generateTicketCode() : null;
     const magicToken = uuidv4();
 
     // 7. Instantiate Registration Domain entity
@@ -100,14 +100,14 @@ export class RegisterAttendeeUseCase {
     // 8. Persist registration
     const saved = await this.registrationRepository.create(registration);
 
-    // 9. If free event (automatically CONFIRMED), dispatch email with ticket details and QR
+    // 9. If free event (automatically CONFIRMED), dispatch email in background
     if (saved.isConfirmed() && this.emailService) {
-      try {
-        await this.emailService.sendTicketEmail(saved.email, {
+      this.emailService
+        .sendTicketEmail(saved.email, {
           recipientName: saved.name,
           recipientEmail: saved.email,
           recipientPhone: saved.phone,
-          ticketCode: saved.ticketCode,
+          ticketCode: saved.ticketCode || '',
           magicToken: saved.magicToken,
           eventTitle: event.title,
           eventSlug: event.slug,
@@ -116,10 +116,10 @@ export class RegisterAttendeeUseCase {
           eventLocation: event.location,
           qrCodeDataUrl: '',
           appUrl: dto.appUrl,
+        })
+        .catch((error) => {
+          console.error('[RegisterAttendeeUseCase] Error sending ticket email:', error);
         });
-      } catch (error) {
-        console.error('[RegisterAttendeeUseCase] Error sending ticket email:', error);
-      }
     }
 
     return saved;

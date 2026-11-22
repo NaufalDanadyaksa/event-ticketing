@@ -581,40 +581,40 @@
 
 ### 5.A Setup Frontend Project
 
-- [ ] **5.1** Inisialisasi Vite + React + TypeScript: `npm create vite@latest apps/frontend -- --template react-ts`
-- [ ] **5.2** Install Tailwind CSS: `npm install -D tailwindcss postcss autoprefixer`
-- [ ] **5.3** Setup Tailwind config (`tailwind.config.ts`) dengan content paths
-- [ ] **5.4** Install dependencies frontend:
+- [x] **5.1** Inisialisasi Vite + React + TypeScript: `npm create vite@latest apps/frontend -- --template react-ts`
+- [x] **5.2** Install Tailwind CSS: `npm install -D tailwindcss postcss autoprefixer`
+- [x] **5.3** Setup Tailwind config (`tailwind.config.ts`) dengan content paths
+- [x] **5.4** Install dependencies frontend:
   ```
   react-router-dom, axios, zustand, qrcode.react, html5-qrcode, shared (workspace:*)
   ```
-- [ ] **5.5** Buat `apps/frontend/src/services/api/apiClient.ts` — Axios instance:
+- [x] **5.5** Buat `apps/frontend/src/services/api/apiClient.ts` — Axios instance:
   - Base URL dari env (`VITE_API_URL`)
   - Request interceptor: attach `Authorization: Bearer <token>` dari Zustand store
   - Response interceptor: tangkap `401` → clear auth state → redirect ke `/login`
 
 ### 5.B Auth State Management
 
-- [ ] **5.6** Buat `apps/frontend/src/store/authStore.ts` (Zustand):
+- [x] **5.6** Buat `apps/frontend/src/store/authStore.ts` (Zustand):
   - State: `{ user: IUser | null; accessToken: string | null; isAuthenticated: boolean }`
   - Actions: `login(token, user)`, `logout()`, `setUser(user)`
   - Persistence: `localStorage` via Zustand persist middleware
-- [ ] **5.7** Buat `apps/frontend/src/hooks/useAuth.ts`:
+- [x] **5.7** Buat `apps/frontend/src/hooks/useAuth.ts`:
   - Wrapper di atas authStore + API calls auth
   - Methods: `login(email, password)`, `register(data)`, `logout()`, `fetchProfile()`
 
 ### 5.C API Service Layer
 
-- [ ] **5.8** Buat `apps/frontend/src/services/api/auth.api.ts`: `register()`, `login()`, `getProfile()`
-- [ ] **5.9** Buat `apps/frontend/src/services/api/events.api.ts`: `listEvents()`, `getEventBySlug()`
-- [ ] **5.10** Buat `apps/frontend/src/services/api/registrations.api.ts`: `registerForEvent(FormData)`, `getTicketByMagicToken()`, `getMyTickets()`
-- [ ] **5.11** Buat `apps/frontend/src/services/api/admin.api.ts`: `createEvent()`, `updateEvent()`, `listAdminEvents()`, `togglePublish()`, `listRegistrations()`, `reviewPayment()`, `getLiveAttendanceToken()`
-- [ ] **5.12** Buat `apps/frontend/src/services/api/staff.api.ts`: `checkIn(ticketCode)`
-- [ ] **5.13** Buat `apps/frontend/src/services/api/attendance.api.ts`: `verifyAttendance(payload)`
+- [x] **5.8** Buat `apps/frontend/src/services/api/auth.api.ts`: `register()`, `login()`, `getProfile()`
+- [x] **5.9** Buat `apps/frontend/src/services/api/events.api.ts`: `listEvents()`, `getEventBySlug()`
+- [x] **5.10** Buat `apps/frontend/src/services/api/registrations.api.ts`: `registerForEvent(FormData)`, `getTicketByMagicToken()`, `getMyTickets()`
+- [x] **5.11** Buat `apps/frontend/src/services/api/admin.api.ts`: `createEvent()`, `updateEvent()`, `listAdminEvents()`, `togglePublish()`, `listRegistrations()`, `reviewPayment()`, `getLiveAttendanceToken()`
+- [x] **5.12** Buat `apps/frontend/src/services/api/staff.api.ts`: `checkIn(ticketCode)`
+- [x] **5.13** Buat `apps/frontend/src/services/api/attendance.api.ts`: `verifyAttendance(payload)`
 
 ### 5.D Reusable Components
 
-- [ ] **5.14** Buat UI primitives di `src/components/ui/`:
+- [x] **5.14** Buat UI primitives di `src/components/ui/`:
   - `Button.tsx`: Variants (primary, secondary, danger, ghost), loading state
   - `Input.tsx`: Label, error message, controlled input
   - `Badge.tsx`: Status badge (CONFIRMED=hijau, PAYMENT_SUBMITTED=kuning, REJECTED=merah, dll.)
@@ -622,35 +622,35 @@
   - `Spinner.tsx`: Loading indicator
   - `Card.tsx`: Container card dengan shadow
 
-- [ ] **5.15** Buat `src/components/QRScanner.tsx`:
+- [x] **5.15** Buat `src/components/QRScanner.tsx`:
   - Wrapper `html5-qrcode` untuk scanning kamera
   - Props: `onScan(result: string)`, `onError(err: string)`, `facingMode: "environment" | "user"`
   - Request permission kamera saat mount
   - Stop camera saat unmount (cleanup)
 
-- [ ] **5.16** Buat `src/components/QRCodeDisplay.tsx`:
+- [x] **5.16** Buat `src/components/QRCodeDisplay.tsx`:
   - Gunakan `qrcode.react` untuk render QR sebagai SVG/Canvas
   - Props: `value: string`, `size: number`, `level: "L" | "M" | "Q" | "H"`
 
-- [ ] **5.17** Buat `src/components/TicketCard.tsx`:
+- [x] **5.17** Buat `src/components/TicketCard.tsx`:
   - Tampilkan kartu tiket visual (kode tiket, nama, event, tanggal, status badge)
   - Props: `ticket: ITicketDetail`
 
-- [ ] **5.18** Buat `src/components/EventCard.tsx`:
+- [x] **5.18** Buat `src/components/EventCard.tsx`:
   - Card event untuk halaman daftar (banner, judul, tanggal, harga, kuota)
   - Props: `event: IEventListItem`
 
-- [ ] **5.19** Buat `src/components/AttendanceTimer.tsx`:
+- [x] **5.19** Buat `src/components/AttendanceTimer.tsx`:
   - Progress bar countdown animasi (10 detik → 0 detik → reset)
   - Props: `expiresInMs: number`, `onExpire: () => void` (trigger fetch token baru)
   - Menggunakan CSS transition / requestAnimationFrame
 
 ### 5.E Layouts & Routing
 
-- [ ] **5.20** Buat `src/layouts/PublicLayout.tsx`: Navbar dengan login/register button, footer
-- [ ] **5.21** Buat `src/layouts/AdminLayout.tsx`: Sidebar navigasi Admin (Events, Registrations), logout button
-- [ ] **5.22** Buat `src/layouts/StaffLayout.tsx`: Navbar minimal untuk halaman staff scanner
-- [ ] **5.23** Buat `src/App.tsx` — React Router DOM setup:
+- [x] **5.20** Buat `src/layouts/PublicLayout.tsx`: Navbar dengan login/register button, footer
+- [x] **5.21** Buat `src/layouts/AdminLayout.tsx`: Sidebar navigasi Admin (Events, Registrations), logout button
+- [x] **5.22** Buat `src/layouts/StaffLayout.tsx`: Navbar minimal untuk halaman staff scanner
+- [x] **5.23** Buat `src/App.tsx` — React Router DOM setup:
   ```
   / → PublicLayout > HomePage
   /events/:slug → PublicLayout > EventDetailPage
@@ -667,23 +667,23 @@
     /admin/events/:id/live-attendance → VenuePresenterPage
   /staff/gate-scanner → PrivateRoute(STAFF,ADMIN) > StaffLayout > GateScannerPage
   ```
-- [ ] **5.24** Buat komponen `PrivateRoute.tsx` — Redirect ke `/login` jika belum auth atau role tidak sesuai
+- [x] **5.24** Buat komponen `PrivateRoute.tsx` — Redirect ke `/login` jika belum auth atau role tidak sesuai
 
 ### 5.F Halaman Publik
 
-- [ ] **5.25** Buat `src/pages/public/HomePage.tsx`:
+- [x] **5.25** Buat `src/pages/public/HomePage.tsx`:
   - Panggil `listEvents()`, tampilkan grid `EventCard`
   - Pagination sederhana
   - Search bar filter event
   - Skeleton loading state
 
-- [ ] **5.26** Buat `src/pages/public/EventDetailPage.tsx`:
+- [x] **5.26** Buat `src/pages/public/EventDetailPage.tsx`:
   - Fetch detail event by slug
   - Tampilkan: banner, deskripsi, jadwal, lokasi, harga, info pembayaran (jika paid), sisa kuota
   - Tombol "Daftar Sekarang" → navigate ke `/events/:id/register`
   - Handle: deadline lewat, kuota penuh (disable tombol + pesan)
 
-- [ ] **5.27** Buat `src/pages/public/RegisterPage.tsx`:
+- [x] **5.27** Buat `src/pages/public/RegisterPage.tsx`:
   - Jika user login: form auto-fill dari profil (nama, email, phone), boleh edit
   - Jika guest: form wajib isi nama, email, phone
   - Jika event berbayar: tampilkan info rekening + field upload bukti transfer (input file)
@@ -694,24 +694,24 @@
 
 ### 5.G Halaman Auth
 
-- [ ] **5.28** Buat `src/pages/auth/LoginPage.tsx`:
+- [x] **5.28** Buat `src/pages/auth/LoginPage.tsx`:
   - Form email + password dengan validasi Zod
   - Panggil `useAuth().login()`
   - Redirect ke halaman asal atau `/my-tickets` setelah login
   - Link ke halaman daftar akun
 
-- [ ] **5.29** Buat `src/pages/auth/RegisterAccountPage.tsx`:
+- [x] **5.29** Buat `src/pages/auth/RegisterAccountPage.tsx`:
   - Form: nama, email, password, konfirmasi password, phone (optional)
   - Validasi Zod di sisi client
   - Auto-login setelah daftar sukses
 
 ### 5.H Halaman Peserta
 
-- [ ] **5.30** Buat `src/pages/attendee/MyTicketsPage.tsx` (Hanya User login):
+- [x] **5.30** Buat `src/pages/attendee/MyTicketsPage.tsx` (Hanya User login):
   - Daftar tiket user dengan status masing-masing
   - Tiap tiket ada tombol "Lihat Tiket Digital" → ke `/tickets/:magicToken`
 
-- [ ] **5.31** Buat `src/pages/attendee/DigitalTicketPage.tsx` (Publik via Magic Link):
+- [x] **5.31** Buat `src/pages/attendee/DigitalTicketPage.tsx` (Publik via Magic Link):
   - Fetch detail tiket by `magicToken`
   - Tampilkan `TicketCard` dengan semua detail
   - Render QR Code tiket (nilai: `ticketCode`) menggunakan `QRCodeDisplay`
@@ -720,23 +720,23 @@
     - Jika `checkInStatus === NOT_CHECKED_IN`: tampilkan badge "Belum Check-in"
     - Jika `attendanceEnabled && checkInStatus === CHECKED_IN && attendanceStatus === ABSENT`:
       → Tampilkan tombol aktif **"Scan Absensi Acara"** (buka modal scanner)
-    - Jika `attendanceStatus === ATTENDED`: tampilkan badge "✅ Sudah Absen [jam]"
+    - Jika `attendanceStatus === ATTENDED`: tampilkan badge "Sudah Absen"
   - Modal Scanner Absensi:
     - Aktifkan `QRScanner` component (kamera belakang)
     - Saat QR terbaca: POST ke `/api/attendance/verify`
     - Feedback:
-      - Sukses: tampilkan overlay hijau "🎉 Absensi Berhasil!" + tutup modal
+      - Sukses: tampilkan overlay hijau "Absensi Berhasil!" + tutup modal
       - Gagal (expired): tampilkan "QR kedaluwarsa, scan ulang layar"
       - Gagal (belum gate check-in): tampilkan "Hubungi staff di pintu masuk"
 
 ### 5.I Halaman Admin
 
-- [ ] **5.32** Buat `src/pages/admin/EventListPage.tsx`:
+- [x] **5.32** Buat `src/pages/admin/EventListPage.tsx`:
   - Tabel daftar semua event (termasuk draft)
   - Kolom: judul, tanggal, harga, kuota, status publish, jumlah pendaftar
   - Tombol: Edit, Toggle Publish, Lihat Proyektor Absensi
 
-- [ ] **5.33** Buat `src/pages/admin/EventFormPage.tsx` (Create & Edit):
+- [x] **5.33** Buat `src/pages/admin/EventFormPage.tsx` (Create & Edit):
   - Form lengkap untuk membuat/mengedit event:
     - Judul, Deskripsi (textarea), Upload banner (preview)
     - Toggle isPaid → kondisional tampilkan field harga dan rekening bank
@@ -747,7 +747,7 @@
   - Validasi penuh di sisi client sebelum submit
   - Mode: Create (POST) atau Edit (PUT) berdasarkan ada/tidaknya param `:id`
 
-- [ ] **5.34** Buat `src/pages/admin/PaymentReviewPage.tsx`:
+- [x] **5.34** Buat `src/pages/admin/PaymentReviewPage.tsx`:
   - Filter by event + filter by status (PAYMENT_SUBMITTED, CONFIRMED, REJECTED)
   - Tabel pendaftar dengan: nama, email, event, tanggal daftar, status, link bukti bayar
   - Tombol Approve (hijau) / Reject (merah) per baris
@@ -755,7 +755,7 @@
   - Konfirmasi sebelum approve (agar tidak salah klik)
   - Auto-refresh setelah action sukses
 
-- [ ] **5.35** Buat `src/pages/admin/VenuePresenterPage.tsx`:
+- [x] **5.35** Buat `src/pages/admin/VenuePresenterPage.tsx`:
   - Route: `/admin/events/:id/live-attendance`
   - Layout full-screen (tombol fullscreen toggle)
   - Polling tiap 5 detik ke `getLiveAttendanceToken(eventId)`
@@ -766,15 +766,15 @@
 
 ### 5.J Halaman Staff
 
-- [ ] **5.36** Buat `src/pages/staff/GateScannerPage.tsx`:
+- [x] **5.36** Buat `src/pages/staff/GateScannerPage.tsx`:
   - `QRScanner` component aktif (kamera belakang)
   - Setiap QR scan berhasil:
     - POST ke `/api/staff/check-in`
     - Tampilkan result card dengan nama peserta + event
     - Feedback visual:
-      - ✅ Hijau animasi: "Selamat Datang [Nama]!"
-      - ⚠️ Oranye: "Tiket sudah digunakan pada [jam]"
-      - ❌ Merah: "Tiket tidak valid atau belum dikonfirmasi"
+      - Hijau animasi: "Selamat Datang [Nama]!"
+      - Oranye: "Tiket sudah digunakan pada [jam]"
+      - Merah: "Tiket tidak valid atau belum dikonfirmasi"
     - Auto-reset kamera scan setelah 3 detik untuk siap scan berikutnya
   - Input manual field (fallback untuk QR tidak terbaca):
     - Input teks ticketCode + tombol submit
@@ -787,6 +787,7 @@
 - Test alur registrasi (guest dan user login)
 - Test scan QR di halaman staff (simulasi ticketCode valid)
 - Test halaman proyektor: QR berubah setiap 10 detik
+[SELESAI & TERVERIFIKASI]
 
 ---
 

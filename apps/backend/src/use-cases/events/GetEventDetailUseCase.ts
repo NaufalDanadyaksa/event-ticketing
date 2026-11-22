@@ -1,10 +1,10 @@
 import { RegistrationStatus, IEventAvailability } from 'shared';
-import { Event } from '../../domain/entities';
+import { Event, PublicEventJSON } from '../../domain/entities';
 import { EventNotFoundError } from '../../domain/errors';
 import { IEventRepository } from '../../domain/repositories';
 
 export interface EventDetailOutput {
-  event: Event;
+  event: PublicEventJSON;
   registeredCount: number;
   availability: IEventAvailability;
 }
@@ -42,7 +42,7 @@ export class GetEventDetailUseCase {
     const available = event.isPublished && !deadlinePassed && !quotaFull;
 
     return {
-      event,
+      event: event.toPublicJSON(),
       registeredCount,
       availability: {
         available,

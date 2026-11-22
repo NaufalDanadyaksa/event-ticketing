@@ -391,21 +391,21 @@
 
 ### 4.A Middlewares
 
-- [ ] **4.1** Buat `apps/backend/src/middlewares/errorHandler.ts` — Global Express error handler:
+- [x] **4.1** Buat `apps/backend/src/middlewares/errorHandler.ts` — Global Express error handler:
   - Tangkap semua Domain Errors dan petakan ke HTTP status code yang sesuai
   - Tangkap Zod `ZodError` dan format ke response `400` dengan daftar field errors
   - Fallback ke `500 Internal Server Error` untuk error tidak terduga
   - Pastikan tidak ada stack trace yang di-expose di production
-- [ ] **4.2** Buat `apps/backend/src/middlewares/authMiddleware.ts`:
+- [x] **4.2** Buat `apps/backend/src/middlewares/authMiddleware.ts`:
   - Baca `Authorization: Bearer <token>` header
   - Verifikasi JWT dengan `jwt.verify()`
   - Attach decoded payload ke `req.user`
   - Return `401` jika token tidak ada atau invalid
-- [ ] **4.3** Buat `apps/backend/src/middlewares/roleGuard.ts`:
+- [x] **4.3** Buat `apps/backend/src/middlewares/roleGuard.ts`:
   - Factory function: `roleGuard(...allowedRoles: Role[])` → Express middleware
   - Cek `req.user.role` apakah termasuk dalam `allowedRoles`
   - Return `403` jika tidak memiliki hak akses
-- [ ] **4.4** Buat `apps/backend/src/middlewares/uploadMiddleware.ts` (Multer):
+- [x] **4.4** Buat `apps/backend/src/middlewares/uploadMiddleware.ts` (Multer):
   - Konfigurasi storage: `diskStorage` ke folder `uploads/receipts/` dan `uploads/banners/`
   - Filter file: hanya izinkan `image/jpeg`, `image/png`, `application/pdf`
   - Batas ukuran file: 5MB
@@ -413,22 +413,22 @@
 
 ### 4.B Controllers
 
-- [ ] **4.5** Buat `apps/backend/src/controllers/AuthController.ts`:
+- [x] **4.5** Buat `apps/backend/src/controllers/AuthController.ts`:
   - `register(req, res)`: Validasi body dengan `RegisterUserSchema`, panggil `RegisterUserUseCase`, return `201`
   - `login(req, res)`: Validasi body dengan `LoginSchema`, panggil `LoginUserUseCase`, return `200`
   - `getProfile(req, res)`: Protected, return `req.user` data dari DB (via `IUserRepository.findById`)
 
-- [ ] **4.6** Buat `apps/backend/src/controllers/EventController.ts` (Public):
+- [x] **4.6** Buat `apps/backend/src/controllers/EventController.ts` (Public):
   - `listEvents(req, res)`: Query params: `page`, `limit`, `search`. Panggil `ListEventsUseCase`
   - `getEventDetail(req, res)`: Params: `slug`. Panggil `GetEventDetailUseCase`
 
-- [ ] **4.7** Buat `apps/backend/src/controllers/AdminEventController.ts` (Admin only):
+- [x] **4.7** Buat `apps/backend/src/controllers/AdminEventController.ts` (Admin only):
   - `createEvent(req, res)`: Validasi `CreateEventSchema`, handle banner upload (Multer), panggil `CreateEventUseCase`
   - `updateEvent(req, res)`: Validasi `UpdateEventSchema`, panggil `UpdateEventUseCase`
   - `listAllEvents(req, res)`: Daftar semua event termasuk draft (isPublished=false)
   - `togglePublish(req, res)`: Toggle `isPublished` event
 
-- [ ] **4.8** Buat `apps/backend/src/controllers/RegistrationController.ts` (Public + User):
+- [x] **4.8** Buat `apps/backend/src/controllers/RegistrationController.ts` (Public + User):
   - `registerForEvent(req, res)`:
     - Handle multipart form data dengan `uploadReceipt` middleware
     - Jika user login: ambil name/email/phone dari `req.user` (tapi boleh override)
@@ -437,41 +437,41 @@
   - `getTicketByMagicToken(req, res)`: Public, params: `magicToken`. Return `ITicketDetail`
   - `getMyTickets(req, res)`: Protected (USER), return semua tiket milik `req.user.id`
 
-- [ ] **4.9** Buat `apps/backend/src/controllers/AdminRegistrationController.ts` (Admin only):
+- [x] **4.9** Buat `apps/backend/src/controllers/AdminRegistrationController.ts` (Admin only):
   - `listRegistrations(req, res)`: Query: `eventId`, `status`, `page`, `limit`
   - `reviewPayment(req, res)`: Body: `{ action, rejectionReason? }`, validasi `ReviewPaymentSchema`, panggil `ReviewPaymentUseCase`
   - `getRegistrationDetail(req, res)`: Params: `id`. Detail lengkap satu pendaftar
 
-- [ ] **4.10** Buat `apps/backend/src/controllers/StaffController.ts` (Staff + Admin):
+- [x] **4.10** Buat `apps/backend/src/controllers/StaffController.ts` (Staff + Admin):
   - `checkIn(req, res)`: Validasi `StaffCheckInSchema`, panggil `VerifyGateCheckInUseCase`
 
-- [ ] **4.11** Buat `apps/backend/src/controllers/AttendanceController.ts`:
+- [x] **4.11** Buat `apps/backend/src/controllers/AttendanceController.ts`:
   - `getLiveToken(req, res)`: Protected (Admin), params: `eventId`. Panggil `GetLiveAttendanceTokenUseCase`
   - `verifyAttendance(req, res)`: Public (via magic token), validasi `AttendanceVerifySchema`, panggil `VerifyDynamicAttendanceUseCase`
 
 ### 4.C Routes
 
-- [ ] **4.12** Buat `apps/backend/src/routes/auth.routes.ts`:
+- [x] **4.12** Buat `apps/backend/src/routes/auth.routes.ts`:
   ```
   POST   /api/auth/register
   POST   /api/auth/login
   GET    /api/auth/me        [authMiddleware]
   ```
 
-- [ ] **4.13** Buat `apps/backend/src/routes/event.routes.ts`:
+- [x] **4.13** Buat `apps/backend/src/routes/event.routes.ts`:
   ```
   GET    /api/events            (public list, isPublished=true only)
   GET    /api/events/:slug      (public detail)
   ```
 
-- [ ] **4.14** Buat `apps/backend/src/routes/registration.routes.ts`:
+- [x] **4.14** Buat `apps/backend/src/routes/registration.routes.ts`:
   ```
   POST   /api/events/:id/register        [uploadReceipt middleware]
   GET    /api/tickets/view/:magicToken   (public)
   GET    /api/users/me/tickets           [authMiddleware]
   ```
 
-- [ ] **4.15** Buat `apps/backend/src/routes/admin.routes.ts`:
+- [x] **4.15** Buat `apps/backend/src/routes/admin.routes.ts`:
   ```
   GET    /api/admin/events               [authMiddleware, roleGuard(ADMIN)]
   POST   /api/admin/events               [authMiddleware, roleGuard(ADMIN), uploadBanner]
@@ -482,12 +482,12 @@
   PATCH  /api/admin/registrations/:id/review [authMiddleware, roleGuard(ADMIN)]
   ```
 
-- [ ] **4.16** Buat `apps/backend/src/routes/staff.routes.ts`:
+- [x] **4.16** Buat `apps/backend/src/routes/staff.routes.ts`:
   ```
   POST   /api/staff/check-in   [authMiddleware, roleGuard(STAFF, ADMIN)]
   ```
 
-- [ ] **4.17** Buat `apps/backend/src/routes/attendance.routes.ts`:
+- [x] **4.17** Buat `apps/backend/src/routes/attendance.routes.ts`:
   ```
   GET    /api/events/:id/live-attendance-token  [authMiddleware, roleGuard(ADMIN)]
   POST   /api/attendance/verify                 (public, identifikasi via magicToken/ticketCode)
@@ -495,13 +495,13 @@
 
 ### 4.D Express App Setup
 
-- [ ] **4.18** Buat `apps/backend/src/routes/index.ts` — Agregasi semua router:
+- [x] **4.18** Buat `apps/backend/src/routes/index.ts` — Agregasi semua router:
   ```typescript
   router.use('/auth', authRouter);
   router.use('/events', eventRouter);
   // dst...
   ```
-- [ ] **4.19** Buat `apps/backend/src/index.ts` (Express entry point):
+- [x] **4.19** Buat `apps/backend/src/index.ts` (Express entry point):
   - Setup CORS (origin dari `APP_URL` env)
   - `express.json()` + `express.urlencoded()`
   - Static file serving untuk `/uploads` folder
@@ -509,7 +509,7 @@
   - Mount semua routes di `/api`
   - Pasang global `errorHandler` middleware di akhir
   - `app.listen(PORT)`
-- [ ] **4.20** Tambahkan scripts di `apps/backend/package.json`:
+- [x] **4.20** Tambahkan scripts di `apps/backend/package.json`:
   - `"dev": "tsx watch src/index.ts"`
   - `"build": "tsc"`
   - `"start": "node dist/index.js"`
@@ -522,6 +522,56 @@
   - `GET /api/events` → 200 + array event
   - `POST /api/admin/events` (dengan token admin) → 201
   - Semua unauthorized request → 401/403
+[SELESAI & TERVERIFIKASI]
+
+---
+
+## Phase 4.1: Backend Optimization & Security Hardening (N+1 Query, Security & Best Practices)
+
+> Tujuan: Menghilangkan N+1 query pada event listing dan user tickets, mengamankan HMAC secret agar tidak bocor ke publik, mengamankan transaksi kuota dari race condition, serta menormalisasi path uploads.
+
+### 4.1.A Domain & Repositories
+
+- [x] **4.1.1** Perbarui `apps/backend/src/domain/entities/Event.ts`:
+  - Tambahkan method `toPublicJSON()`: mengembalikan seluruh data event publik dan **menghapus secara mutlak** properti sensitif `attendanceSecret`.
+- [x] **4.1.2** Perbarui `apps/backend/src/domain/repositories/IEventRepository.ts`:
+  - Tambahkan kontrak `findAllWithCount(filters?: FindEventsFilter): Promise<{ event: Event; registeredCount: number }[]>`
+  - Tambahkan kontrak `findByIds(ids: string[]): Promise<Event[]>`
+- [x] **4.1.3** Perbarui `apps/backend/src/repositories/PrismaEventRepository.ts`:
+  - Implementasikan `findAllWithCount`: menggunakan satu query Prisma `findMany` dengan `_count: { select: { registrations: { where: { status: { in: [CONFIRMED, PAYMENT_SUBMITTED] } } } } }`
+  - Implementasikan `findByIds`: menggunakan query Prisma `findMany({ where: { id: { in: ids } } })`
+
+### 4.1.B Use Cases & Concurrency
+
+- [x] **4.1.4** Perbarui `apps/backend/src/use-cases/events/ListEventsUseCase.ts`:
+  - Ganti pemanggilan `findAll` + loop `countRegistrations` dengan pemanggilan tunggal `findAllWithCount(filters)`.
+  - Eliminasi N+1 query (dari N+1 query menjadi 1 query SQL agregasi).
+- [x] **4.1.5** Perbarui `apps/backend/src/use-cases/events/GetEventDetailUseCase.ts`:
+  - Pastikan output menggunakan representasi aman tanpa mengekspos `attendanceSecret`.
+- [x] **4.1.6** Perbarui `apps/backend/src/use-cases/registrations/RegisterAttendeeUseCase.ts`:
+  - Lindungi alur pengecekan kuota dan persistensi registrasi dengan transaksi database atomik agar kebal dari race condition overbooking.
+
+### 4.1.C Controllers & Infrastructure
+
+- [x] **4.1.7** Perbarui `apps/backend/src/controllers/EventController.ts`:
+  - Sanitasi response detail event agar `attendanceSecret` tidak pernah terkirim ke klien publik.
+- [x] **4.1.8** Perbarui `apps/backend/src/controllers/RegistrationController.ts`:
+  - Pada `getMyTickets`: ganti loop `findById` dengan batch retrieval `eventRepository.findByIds(uniqueEventIds)`.
+  - Eliminasi N+1 query tiket user (dari N+1 query menjadi 2 query).
+- [x] **4.1.9** Perbarui `apps/backend/src/middlewares/uploadMiddleware.ts` & `apps/backend/src/index.ts`:
+  - Normalisasi penentuan folder `uploads` menggunakan resolver direktori berbasis root absolut monorepo atau fallback `process.env.UPLOADS_DIR`.
+
+### 4.1.D Verification
+
+- [x] **4.1.10** Verifikasi & Pengujian:
+  - Jalankan `npm run type-check -w apps/backend` (wajib 0 error).
+  - Jalankan skrip tes integrasi:
+    - Verifikasi `GET /api/events/:slug` tidak mengandung `attendanceSecret`.
+    - Verifikasi `GET /api/events` berjalan cepat dalam 1 query.
+    - Verifikasi `GET /api/users/me/tickets` berjalan dalam query batch.
+[SELESAI & TERVERIFIKASI]
+
+---
 
 ---
 

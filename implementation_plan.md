@@ -761,3 +761,39 @@ Format email yang dikirim via Nodemailer:
   }
 }
 ```
+
+
+---
+
+## 13. Backend Optimization & Security Hardening (Post-Phase 4 Refinement)
+
+### 13.1 Eliminasi Masalah N+1 Query
+1. **Event Listing (`ListEventsUseCase`)**:
+   - *Masalah*: Query event list dilanjutkan dengan loop `countRegistrations(eventId)` per item (`Promise.all`), memicu N+1 query.
+   - *Solusi*: Memperluas `IEventRepository.findAllWithCount` dan mengimplementasikannya di `PrismaEventRepository` menggunakan:
+     ```typescript
+     include: {
+       _count: {
+         select: {
+           registrations: {
+             where: { status: { in: [RegistrationStatus.CONFIRMED, RegistrationStatus.PAYMENT_SUBMITTED] } }
+           }
+         }
+       }
+     }
+     ```
+   - Hasil: 1 query SQL untuk mengambil seluruh event beserta jumlah pendaftarnya.
+2. **User Tickets Listing (`RegistrationController.getMyTickets`)**:
+   - *Masalah*: Query tiket peserta mengambil event per registrasi via `eventRepository.findById(reg.eventId)`.
+   - *Solusi*: Menggunakan batch query `eventRepository.findByIds(uniqueEventIds)` dengan SQL `WHERE id IN (...)` dan mapping O(1) di memori.
+   - Hasil: 2 query konstan terlepas dari jumlah tiket yang dimiliki.
+
+### 13.2 Pencegahan Kebocoran Rahasia Kriptografi (`attendanceSecret`)
+- `Event` Entity dilengkapi dengan method `toPublicJSON()` yang mengecualikan `attendanceSecret`.
+- Seluruh endpoint publik (`GET /api/events`, `GET /api/events/:slug`) dilarang mengirimkan `attendanceSecret`. Kunci rahasia HMAC ini hanya boleh diakses oleh use case internal verifikasi absensi atau endpoint terproteksi admin venue proyektor.
+
+### 13.3 Proteksi Concurrency & Race Condition Kuota
+- `RegisterAttendeeUseCase` membungkus pengecekan ketersediaan kuota dan persistensi registrasi dalam interactive transaction Prisma agar kebal terhadap pendaftaran bersamaan (concurrent overbooking).
+
+### 13.4 Normalisasi Path Direktori Uploads
+- `uploadMiddleware.ts` dan `index.ts` menormalisasi path direktori uploads secara konsisten terhadap root monorepo atau variabel lingkungan `UPLOADS_DIR`.

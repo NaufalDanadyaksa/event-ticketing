@@ -43,6 +43,18 @@ export class PrismaEventRepository implements IEventRepository {
     return event ? this.toDomain(event) : null;
   }
 
+  async findByIds(ids: string[]): Promise<Event[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    const events = await this.client.event.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+    return events.map((e) => this.toDomain(e));
+  }
+
   async create(event: Event): Promise<Event> {
     const created = await this.client.event.create({
       data: {
@@ -122,10 +134,55 @@ export class PrismaEventRepository implements IEventRepository {
 
     const events = await this.client.event.findMany({
       where,
+      skip: filters?.skip,
+      take: filters?.take,
       orderBy: { eventStartDate: 'asc' },
     });
 
     return events.map(e => this.toDomain(e));
+  }
+
+  async findAllWithCount(filters?: FindEventsFilter): Promise<{ event: Event; registeredCount: number }[]> {
+    const where: Prisma.EventWhereInput = {};
+    if (filters?.isPublished !== undefined) {
+      where.isPublished = filters.isPublished;
+    }
+    if (filters?.createdById) {
+      where.createdById = filters.createdById;
+    }
+    if (filters?.search) {
+      const search = filters.search.trim();
+      where.OR = [
+        { title: { contains: search } },
+        { description: { contains: search } },
+        { location: { contains: search } },
+      ];
+    }
+
+    const events = await this.client.event.findMany({
+      where,
+      include: {
+        _count: {
+          select: {
+            registrations: {
+              where: {
+                status: {
+                  in: [RegistrationStatus.CONFIRMED, RegistrationStatus.PAYMENT_SUBMITTED],
+                },
+              },
+            },
+          },
+        },
+      },
+      skip: filters?.skip,
+      take: filters?.take,
+      orderBy: { eventStartDate: 'asc' },
+    });
+
+    return events.map((e) => ({
+      event: this.toDomain(e),
+      registeredCount: e._count.registrations,
+    }));
   }
 
   async countRegistrations(eventId: string, statuses?: RegistrationStatus[]): Promise<number> {

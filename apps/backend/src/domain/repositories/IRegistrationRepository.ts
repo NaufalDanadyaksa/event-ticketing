@@ -8,6 +8,8 @@ export interface FindRegistrationsFilter {
   attendanceStatus?: AttendanceStatus;
   search?: string;
   userId?: string;
+  skip?: number;
+  take?: number;
 }
 
 export interface IRegistrationRepository {
@@ -16,6 +18,11 @@ export interface IRegistrationRepository {
   findByMagicToken(magicToken: string): Promise<Registration | null>;
   findByEventAndEmail(eventId: string, email: string): Promise<Registration | null>;
   findAll(filters: FindRegistrationsFilter): Promise<Registration[]>;
+  findAllByEvent(
+    eventId?: string,
+    status?: RegistrationStatus,
+    options?: { skip?: number; take?: number; search?: string }
+  ): Promise<Registration[]>;
   findByUserId(userId: string): Promise<Registration[]>;
   countByEventId(eventId: string, statuses?: RegistrationStatus[]): Promise<number>;
   create(registration: Registration): Promise<Registration>;

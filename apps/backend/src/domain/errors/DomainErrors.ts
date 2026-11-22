@@ -85,6 +85,13 @@ export class DuplicateEmailError extends DomainError {
   }
 }
 
+export class UserNotFoundError extends DomainError {
+  public readonly statusCode = 404;
+  constructor(message = 'User tidak ditemukan') {
+    super(message);
+  }
+}
+
 export class UnauthorizedError extends DomainError {
   public readonly statusCode = 401;
   constructor(message = 'Autentikasi gagal atau sesi telah berakhir') {

@@ -85,6 +85,39 @@ export class PrismaRegistrationRepository implements IRegistrationRepository {
 
     const list = await this.client.registration.findMany({
       where,
+      skip: filters.skip,
+      take: filters.take,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return list.map(r => this.toDomain(r));
+  }
+
+  async findAllByEvent(
+    eventId?: string,
+    status?: RegistrationStatus,
+    options?: { skip?: number; take?: number; search?: string }
+  ): Promise<Registration[]> {
+    const where: Prisma.RegistrationWhereInput = {};
+    if (eventId) {
+      where.eventId = eventId;
+    }
+    if (status) {
+      where.status = status as any;
+    }
+    if (options?.search) {
+      const search = options.search.trim();
+      where.OR = [
+        { name: { contains: search } },
+        { email: { contains: search } },
+        { ticketCode: { contains: search } },
+      ];
+    }
+
+    const list = await this.client.registration.findMany({
+      where,
+      skip: options?.skip,
+      take: options?.take,
       orderBy: { createdAt: 'desc' },
     });
 

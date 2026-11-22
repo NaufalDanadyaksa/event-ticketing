@@ -22,6 +22,28 @@ export interface EventProps {
   updatedAt: Date;
 }
 
+export interface PublicEventJSON {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  bannerUrl: string | null;
+  isPaid: boolean;
+  price: number;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountHolder: string | null;
+  maxParticipants: number;
+  registrationDeadline: Date;
+  eventStartDate: Date;
+  eventEndDate: Date;
+  location: string;
+  attendanceEnabled: boolean;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export class Event {
   public readonly id: string;
   public title: string;
@@ -103,5 +125,29 @@ export class Event {
 
   public isEventEnded(at: Date = new Date()): boolean {
     return at.getTime() > this.eventEndDate.getTime();
+  }
+
+  public toPublicJSON(): PublicEventJSON {
+    return {
+      id: this.id,
+      title: this.title,
+      slug: this.slug,
+      description: this.description,
+      bannerUrl: this.bannerUrl,
+      isPaid: this.isPaid,
+      price: this.price,
+      bankName: this.isPaid ? this.bankName : null,
+      bankAccountNumber: this.isPaid ? this.bankAccountNumber : null,
+      bankAccountHolder: this.isPaid ? this.bankAccountHolder : null,
+      maxParticipants: this.maxParticipants,
+      registrationDeadline: this.registrationDeadline,
+      eventStartDate: this.eventStartDate,
+      eventEndDate: this.eventEndDate,
+      location: this.location,
+      attendanceEnabled: this.attendanceEnabled,
+      isPublished: this.isPublished,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
   }
 }
